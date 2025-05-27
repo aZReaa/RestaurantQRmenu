@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+
+{% block title %}Menu - Meja {{ meja.nomor_meja }}{% endblock %}
+
+{% block nav_title %}
+    Menu - Meja {{ meja.nomor_meja }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            Selamat datang di <strong>Meja {{ meja.nomor_meja }}</strong>! Pilih menu favorit Anda dan tambahkan ke keranjang.
+        </div>
+    </div>
+</div>
+
+{% if menu_items_by_category %}
+    {% for kategori, menu_items in menu_items_by_category.items %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="text-primary border-bottom pb-2">
+                <i class="fas fa-list me-2"></i>{{ kategori.nama }}
+            </h3>
+            {% if kategori.deskripsi %}
+                <p class="text-muted">{{ kategori.deskripsi }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        {% for item in menu_items %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card menu-item-card h-100">
+                {% if item.gambar %}
+                    <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image text-muted fa-3x"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ item.nama }}</h5>
+                    
+                    {% if item.deskripsi %}
+                        <p class="card-text text-muted small">{{ item.deskripsi }}</p>
+                    {% endif %}
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="h5 text-success mb-0">Rp {{ item.harga|floatformat:0 }}</span>
+                        </div>
+                        
+                        <div class="input-group mb-2">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity({{ item.id }})">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" class="form-control text-center" id="qty-{{ item.id }}" value="1" min="1" max="99">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity({{ item.id }})">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        
+                        <input type="text" class="form-control form-control-sm mb-2" id="note-{{ item.id }}" placeholder="Catatan khusus (opsional)">
+                        
+                        <button class="btn btn-primary w-100" onclick="addToCart({{ item.id }}, '{{ item.nama }}', {{ item.harga }})">
+                            <i class="fas fa-cart-plus me-1"></i>
+                            Tambah ke Keranjang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Maaf, saat ini belum ada menu yang tersedia.
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Floating Cart Button -->
+<div class="floating-cart">
+    <button class="btn btn-success btn-lg rounded-circle" data-bs-toggle="modal" data-bs-target="#cartModal" style="width: 60px; height: 60px;">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cart-count">0</span>
+    </button>
+</div>
+
+<!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Keranjang Belanja
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                        <p>Keranjang masih kosong</p>
+                    </div>
+                </div>
+                
+                <div id="cart-summary" style="display: none;">
+                    <hr>
+                    <div class="row">
+                        <div class="col-6"><strong>Total:</strong></div>
+                        <div class="col-6 text-end"><strong id="cart-total">Rp 0</strong></div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <label for="order-notes" class="form-label">Catatan Pesanan (Opsional)</label>
+                    <textarea class="form-control" id="order-notes" rows="3" placeholder="Tambahkan catatan untuk pesanan Anda..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-danger" onclick="clearCart()" id="clear-cart-btn" style="display: none;">
+                    <i class="fas fa-trash me-1"></i>Kosongkan
+                </button>
+                <button type="button" class="btn btn-success" onclick="checkout()" id="checkout-btn" style="display: none;">
+                    <i class="fas fa-check me-1"></i>Pesan Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Pesanan Berhasil!
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                <h4>Terima Kasih!</h4>
+                <p>Pesanan Anda telah berhasil dikirim ke dapur. Silakan tunggu makanan Anda disiapkan.</p>
+                <p class="text-muted small">Nomor Pesanan: <span id="order-number"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="location.reload()">
+                    <i class="fas fa-redo me-1"></i>Pesan Lagi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let cart = [];
+
+function increaseQuantity(itemId) {
+    const qtyInput = document.getElementById(`qty-${itemId}`);
+    qtyInput.value = parseInt(qtyInput.value) + 1;
+}
+
+function decreaseQuantity(itemId) {
+    const qtyInput = document.getElementById(`qty-${itemId}`);
+    if (parseInt(qtyInput.value) > 1) {
+        qtyInput.value = parseInt(qtyInput.value) - 1;
+    }
+}
+
+function addToCart(itemId, itemName, itemPrice) {
+    const quantity = parseInt(document.getElementById(`qty-${itemId}`).value);
+    const note = document.getElementById(`note-${itemId}`).value;
+    
+    // Cek apakah item sudah ada di keranjang
+    const existingItemIndex = cart.findIndex(item => item.id === itemId);
+    
+    if (existingItemIndex !== -1) {
+        // Update quantity jika sudah ada
+        cart[existingItemIndex].jumlah += quantity;
+        cart[existingItemIndex].subtotal = cart[existingItemIndex].jumlah * cart[existingItemIndex].harga;
+        if (note) {
+            cart[existingItemIndex].catatan = note;
+        }
+    } else {
+        // Tambah item baru
+        cart.push({
+            id: itemId,
+            nama: itemName,
+            harga: itemPrice,
+            jumlah: quantity,
+            subtotal: itemPrice * quantity,
+            catatan: note
+        });
+    }
+    
+    updateCartDisplay();
+    
+    // Reset form
+    document.getElementById(`qty-${itemId}`).value = 1;
+    document.getElementById(`note-${itemId}`).value = '';
+    
+    // Show success message
+    showToast('success', 'Item berhasil ditambahkan ke keranjang!');
+}
+
+function removeFromCart(itemId) {
+    cart = cart.filter(item => item.id !== itemId);
+    updateCartDisplay();
+    showToast('info', 'Item berhasil dihapus dari keranjang');
+}
+
+function updateCartDisplay() {
+    const cartCount = document.getElementById('cart-count');
+    const cartItems = document.getElementById('cart-items');
+    const cartSummary = document.getElementById('cart-summary');
+    const cartTotal = document.getElementById('cart-total');
+    const clearBtn = document.getElementById('clear-cart-btn');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    
+    const totalItems = cart.reduce((sum, item) => sum + item.jumlah, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + item.subtotal, 0);
+    
+    cartCount.textContent = totalItems;
+    
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                <p>Keranjang masih kosong</p>
+            </div>
+        `;
+        cartSummary.style.display = 'none';
+        clearBtn.style.display = 'none';
+        checkoutBtn.style.display = 'none';
+    } else {
+        let itemsHtml = '';
+        cart.forEach(item => {
+            itemsHtml += `
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${item.nama}</h6>
+                        <p class="mb-1 text-muted small">Rp ${item.harga.toLocaleString()} x ${item.jumlah}</p>
+                        ${item.catatan ? `<p class="mb-0 text-info small"><em>Catatan: ${item.catatan}</em></p>` : ''}
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-success">Rp ${item.subtotal.toLocaleString()}</div>
+                        <button class="btn btn-sm btn-outline-danger mt-1" onclick="removeFromCart(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        cartItems.innerHTML = itemsHtml;
+        cartTotal.textContent = `Rp ${totalPrice.toLocaleString()}`;
+        cartSummary.style.display = 'block';
+        clearBtn.style.display = 'inline-block';
+        checkoutBtn.style.display = 'inline-block';
+    }
+}
+
+function clearCart() {
+    if (confirm('Apakah Anda yakin ingin mengosongkan keranjang?')) {
+        cart = [];
+        updateCartDisplay();
+        showToast('info', 'Keranjang berhasil dikosongkan');
+    }
+}
+
+function checkout() {
+    if (cart.length === 0) {
+        showToast('warning', 'Keranjang kosong!');
+        return;
+    }
+    
+    const orderNotes = document.getElementById('order-notes').value;
+    
+    // Disable checkout button
+    const checkoutBtn = document.getElementById('checkout-btn');
+    checkoutBtn.disabled = true;
+    checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Memproses...';
+    
+    fetch('{% url "menu:checkout_keranjang" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            nomor_meja: '{{ meja.nomor_meja }}',
+            items: cart,
+            catatan_pesanan: orderNotes
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Close cart modal
+            const cartModal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+            cartModal.hide();
+            
+            // Show success modal
+            document.getElementById('order-number').textContent = data.pesanan_id;
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            
+            // Clear cart
+            cart = [];
+            updateCartDisplay();
+            document.getElementById('order-notes').value = '';
+        } else {
+            showToast('error', data.message || 'Terjadi kesalahan saat memproses pesanan');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Terjadi kesalahan koneksi');
+    })
+    .finally(() => {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML = '<i class="fas fa-check me-1"></i>Pesan Sekarang';
+    });
+}
+
+function showToast(type, message) {
+    // Simple toast notification (you can replace with a better toast library)
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} border-0 position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = document.body.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+// Initialize cart display
+updateCartDisplay();
+</script>
+{% endblock %}

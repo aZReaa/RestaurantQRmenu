@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+
+{% block title %}Pesanan Meja {{ meja.nomor_meja }}{% endblock %}
+
+{% block nav_title %}
+    <i class="fas fa-cash-register me-2"></i>Pesanan - {{ meja }}
+{% endblock %}
+
+{% block nav_items %}
+<div class="navbar-nav ms-auto">
+    <a class="nav-link" href="{% url 'kasir:kasir_dashboard' %}">
+        <i class="fas fa-arrow-left me-1"></i>Kembali
+    </a>
+    <a class="nav-link" href="{% url 'kasir:dapur' %}">
+        <i class="fas fa-fire me-1"></i>Dapur
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-table me-2"></i>
+                    Informasi Meja
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nomor Meja:</strong> {{ meja.nomor_meja }}</p>
+                        <p><strong>Kapasitas:</strong> {{ meja.kapasitas }} orang</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            {% if meja.is_aktif %}
+                                <span class="badge bg-success">Aktif</span>
+                            {% else %}
+                                <span class="badge bg-danger">Nonaktif</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-receipt me-2"></i>
+                    Pesanan yang Belum Dibayar ({{ pesanan_list|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if pesanan_list %}
+                    {% for pesanan in pesanan_list %}
+                    <div class="border rounded p-3 mb-3 bg-light">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="text-primary mb-1">
+                                            <i class="fas fa-hashtag"></i>Pesanan #{{ pesanan.id }}
+                                        </h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>{{ pesanan.created_at|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        {% if pesanan.status == 'BARU' %}
+                                            <span class="badge bg-warning text-dark">{{ pesanan.get_status_display }}</span>
+                                        {% elif pesanan.status == 'DIPROSES' %}
+                                            <span class="badge bg-info">{{ pesanan.get_status_display }}</span>
+                                        {% elif pesanan.status == 'SELESAI' %}
+                                            <span class="badge bg-success">{{ pesanan.get_status_display }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Detail Items -->
+                                <div class="border-top pt-2">
+                                    <h6 class="mb-2">Detail Pesanan:</h6>
+                                    {% for detail in pesanan.detailpesanan_set.all %}
+                                    <div class="d-flex justify-content-between align-items-center py-1">
+                                        <div>
+                                            <span class="fw-bold">{{ detail.jumlah }}x</span> {{ detail.menu_item.nama }}
+                                            {% if detail.catatan_item %}
+                                                <br><small class="text-info"><em>Note: {{ detail.catatan_item }}</em></small>
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-muted">Rp {{ detail.subtotal|floatformat:0 }}</small>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if pesanan.catatan %}
+                                <div class="border-top pt-2 mt-2">
+                                    <small class="text-info">
+                                        <i class="fas fa-sticky-note me-1"></i>
+                                        <strong>Catatan:</strong> {{ pesanan.catatan }}
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="h4 text-success mb-3">
+                                        Rp {{ pesanan.total_harga|floatformat:0 }}
+                                    </div>                                      {% if pesanan.status == 'SELESAI' %}
+                                        <button class="btn btn-success btn-lg w-100 mb-2" data-pesanan-id="{{ pesanan.id }}" onclick="markAsPaid(this.dataset.pesananId)">
+                                            <i class="fas fa-money-bill-wave me-2"></i>
+                                            Tandai Dibayar
+                                        </button>
+                                        <a href="{% url 'kasir:print_receipt' pesanan.id %}" class="btn btn-outline-primary btn-sm w-100" target="_blank">
+                                            <i class="fas fa-print me-1"></i>
+                                            Print Receipt
+                                        </a>
+                                    {% else %}
+                                        <div class="alert alert-warning small mb-0">
+                                            <i class="fas fa-hourglass-half me-1"></i>
+                                            Menunggu dari dapur
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Total Summary -->
+                    {% if pesanan_list %}
+                    <div class="border-top pt-3 mt-3">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Total Keseluruhan:</h5>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% with total=pesanan_list|first %}
+                                    {% with total_amount=0 %}
+                                        {% for pesanan in pesanan_list %}
+                                            {% with total_amount=total_amount|add:pesanan.total_harga %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                {% endwith %}
+                                
+                                <h4 class="text-success">
+                                    Rp {% widthratio pesanan_list|length 1 0 as zero %}
+                                    {% for pesanan in pesanan_list %}
+                                        {% if forloop.first %}
+                                            {% widthratio pesanan.total_harga 1 1 as running_total %}
+                                        {% else %}
+                                            {% widthratio running_total|add:pesanan.total_harga 1 1 as running_total %}
+                                        {% endif %}
+                                        {% if forloop.last %}
+                                            {{ running_total|floatformat:0 }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                        <h5>Tidak ada pesanan yang belum dibayar</h5>
+                        <p>Semua pesanan untuk meja ini sudah lunas atau belum ada pesanan.</p>
+                        <a href="{% url 'kasir:kasir_dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Kembali ke Dashboard
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmPaymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-money-bill-wave me-2"></i>
+                    Konfirmasi Pembayaran
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin pesanan ini sudah dibayar oleh pelanggan?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Perhatian:</strong> Tindakan ini tidak dapat dibatalkan.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="confirmPaymentBtn">
+                    <i class="fas fa-check me-1"></i>Ya, Sudah Dibayar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPesananId = null;
+
+function markAsPaid(pesananId) {
+    currentPesananId = pesananId;
+    const modal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
+    modal.show();
+}
+
+document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+    if (!currentPesananId) return;
+    
+    const button = this;
+    const originalContent = button.innerHTML;
+    
+    // Disable button and show loading
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Memproses...';
+    
+    fetch(`/kasir/api/update-status-pesanan/${currentPesananId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status: 'DIBAYAR'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showToast('success', 'Pesanan berhasil ditandai sebagai dibayar');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
+            modal.hide();
+            
+            // Reload page after short delay
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showToast('error', data.message || 'Gagal memproses pembayaran');
+            button.disabled = false;
+            button.innerHTML = originalContent;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Terjadi kesalahan koneksi');
+        button.disabled = false;
+        button.innerHTML = originalContent;
+    });
+});
+
+function showToast(type, message) {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = document.body.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+</script>
+{% endblock %}

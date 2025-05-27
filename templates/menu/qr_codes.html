@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}QR Code Management{% endblock %}
+
+{% block nav_title %}
+    <i class="fas fa-qrcode me-2"></i>QR Code Management
+{% endblock %}
+
+{% block nav_items %}
+<div class="navbar-nav ms-auto">
+    <a class="nav-link" href="{% url 'home' %}">
+        <i class="fas fa-home me-1"></i>Home
+    </a>
+    <a class="nav-link" href="/admin/">
+        <i class="fas fa-cogs me-1"></i>Admin
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-qrcode me-2"></i>
+                    Generate QR Code untuk Meja
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-check-circle me-2"></i>
+                            QR Code berhasil digenerate!
+                        </h6>
+                        <p class="mb-0">QR Code telah dibuat untuk semua meja aktif.</p>
+                    </div>
+                    
+                    <h6 class="mt-4 mb-3">Hasil Generate:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nomor Meja</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for nomor_meja, result in results.items %}
+                                <tr>
+                                    <td><strong>Meja {{ nomor_meja }}</strong></td>
+                                    <td>
+                                        {% if result|first == 'E' %}
+                                            <span class="badge bg-danger">{{ result }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Berhasil</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if not result|first == 'E' %}
+                                            <a href="{% url 'menu:download_qr_code' nomor_meja %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </a>
+                                            <a href="/menu/meja/{{ nomor_meja }}/" class="btn btn-sm btn-outline-info" target="_blank">
+                                                <i class="fas fa-external-link-alt me-1"></i>Test Menu
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'menu:qr_codes' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Kembali
+                        </a>
+                    </div>
+                    
+                {% else %}
+                    <p class="text-muted">Generate QR Code untuk semua meja yang aktif. QR Code akan berisi link langsung ke halaman menu masing-masing meja.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-qrcode me-2"></i>
+                            Generate QR Code untuk Semua Meja
+                        </button>
+                    </form>
+                    
+                    <h6 class="mt-4 mb-3">Meja yang Akan Dibuatkan QR Code:</h6>
+                    <div class="row">
+                        {% for meja in meja_list %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">{{ meja }}</h6>
+                                    <p class="card-text small text-muted">
+                                        Kapasitas: {{ meja.kapasitas }} orang
+                                    </p>
+                                    {% if meja.qr_code %}
+                                        <div class="mb-2">
+                                            <span class="badge bg-success">QR Code Tersedia</span>
+                                        </div>
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'menu:download_qr_code' meja.nomor_meja %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </a>
+                                            <a href="/menu/meja/{{ meja.nomor_meja }}/" class="btn btn-sm btn-outline-info" target="_blank">
+                                                <i class="fas fa-external-link-alt me-1"></i>Test Menu
+                                            </a>
+                                        </div>
+                                        <div class="mt-2">
+                                            <img src="{{ meja.qr_code.url }}" alt="QR Code Meja {{ meja.nomor_meja }}" class="img-fluid" style="max-width: 100px;">
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Belum Ada QR Code</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Belum ada meja yang aktif. Silakan tambahkan meja melalui admin panel.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <h6 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>
+                Petunjuk Penggunaan QR Code:
+            </h6>
+            <ol class="mb-0">
+                <li>Generate QR Code untuk semua meja menggunakan tombol di atas</li>
+                <li>Download QR Code dalam format PNG</li>
+                <li>Print QR Code dan letakkan di masing-masing meja</li>
+                <li>Pelanggan dapat scan QR Code untuk langsung mengakses menu meja tersebut</li>
+                <li>Setiap QR Code berisi URL unik untuk meja yang bersangkutan</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

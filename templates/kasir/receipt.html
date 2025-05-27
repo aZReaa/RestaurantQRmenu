@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt - Pesanan #{{ pesanan.id }}</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20px;
+            background: white;
+        }
+        .receipt {
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .restaurant-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .receipt-info {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 10px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+        }
+        .items {
+            margin-bottom: 15px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            align-items: flex-start;
+        }
+        .item-name {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .item-qty {
+            margin-right: 10px;
+            text-align: center;
+            min-width: 20px;
+        }
+        .item-price {
+            text-align: right;
+            min-width: 60px;
+        }
+        .total-section {
+            border-top: 1px dashed #333;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .grand-total {
+            font-weight: bold;
+            font-size: 14px;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed #333;
+            font-size: 10px;
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .receipt {
+                max-width: none;
+                border: none;
+                margin: 0;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <div class="header">
+            <div class="restaurant-name">GACOAN KW</div>
+            <div>Restoran QR Code</div>
+            <div>Jl. Contoh No. 123</div>
+            <div>Telp: (021) 1234567</div>
+        </div>
+
+        <div class="receipt-info">
+            <div class="info-row">
+                <span>Receipt #:</span>
+                <span>{{ pesanan.id }}</span>
+            </div>
+            <div class="info-row">
+                <span>Meja:</span>
+                <span>{{ pesanan.meja.nomor_meja }}</span>
+            </div>
+            <div class="info-row">
+                <span>Tanggal:</span>
+                <span>{{ pesanan.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span>Kasir:</span>
+                <span>Admin</span>
+            </div>
+            <div class="info-row">
+                <span>Print:</span>
+                <span>{{ print_time|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+
+        <div class="items">
+            <div class="item-row" style="font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 8px;">
+                <div class="item-name">Item</div>
+                <div class="item-qty">Qty</div>
+                <div class="item-price">Harga</div>
+            </div>
+            {% for detail in detail_pesanan %}            <div class="item-row">
+                <div class="item-name">{{ detail.menu_item.nama }}</div>
+                <div class="item-qty">{{ detail.jumlah }}x</div>
+                <div class="item-price">Rp {{ detail.subtotal|floatformat:0 }}</div>
+            </div>
+            <div class="item-row" style="margin-top: -3px; margin-bottom: 8px;">
+                <div class="item-name" style="font-size: 11px; color: #666; margin-left: 10px;">
+                    @ Rp {{ detail.harga_per_item|floatformat:0 }} = Rp {{ detail.subtotal|floatformat:0 }}
+                </div>
+                <div class="item-qty"></div>
+                <div class="item-price"></div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="total-section">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span>Rp {{ total|floatformat:0 }}</span>
+            </div>
+            <div class="total-row">
+                <span>Pajak (10%):</span>
+                <span>Rp {{ total|mul:0.1|floatformat:0 }}</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>TOTAL:</span>
+                <span>Rp {{ total|mul:1.1|floatformat:0 }}</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>Terima kasih atas kunjungan Anda!</div>
+            <div>Selamat menikmati hidangan</div>
+            <div style="margin-top: 10px;">
+                Status: {{ pesanan.get_status_display }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto print saat halaman dimuat
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

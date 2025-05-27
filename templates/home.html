@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Restoran QR Code System{% endblock %}
+
+{% block nav_title %}
+    Restoran QR Code System
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="text-center mb-5">
+            <i class="fas fa-qrcode fa-5x text-primary mb-4"></i>
+            <h1 class="display-4 text-primary">Selamat Datang</h1>
+            <p class="lead text-muted">Sistem Manajemen Restoran Berbasis QR Code</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Pelanggan -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <i class="fas fa-users fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Untuk Pelanggan</h5>
+                <p class="card-text flex-grow-1">
+                    Scan QR Code di meja Anda untuk melihat menu dan melakukan pemesanan langsung dari smartphone.
+                </p>
+                <div class="mt-auto">
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Scan QR Code di meja untuk mulai memesan
+                    </div>
+                    <div class="small text-muted">
+                        <strong>Contoh URL:</strong><br>
+                        <code>/menu/meja/1/</code><br>
+                        <code>/menu/meja/A1/</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dapur -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <i class="fas fa-fire fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Kitchen Display</h5>
+                <p class="card-text flex-grow-1">
+                    Monitor pesanan yang masuk secara real-time dan update status pemrosesan makanan.
+                </p>
+                <div class="mt-auto">
+                    <a href="/kasir/dapur/" class="btn btn-warning w-100">
+                        <i class="fas fa-fire me-2"></i>
+                        Buka Kitchen Display
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kasir -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body d-flex flex-column">
+                <i class="fas fa-cash-register fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Kasir</h5>
+                <p class="card-text flex-grow-1">
+                    Proses pembayaran pesanan pelanggan dan kelola transaksi keuangan restoran.
+                </p>
+                <div class="mt-auto">
+                    <a href="/kasir/kasir_dashboard/" class="btn btn-primary w-100">
+                        <i class="fas fa-cash-register me-2"></i>
+                        Buka Dashboard Kasir
+                    </a>
+                </div>
+            </div>
+        </div>    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-cogs me-2"></i>
+                    Admin Panel
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Kelola data master seperti meja, kategori menu, dan menu items melalui Django Admin.
+                </p>
+                <a href="/admin/" class="btn btn-dark" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i>
+                    Buka Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-qrcode me-2"></i>
+                    QR Code Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Generate dan kelola QR Code untuk setiap meja restoran.
+                </p>
+                <a href="/menu/qr-codes/" class="btn btn-info">
+                    <i class="fas fa-qrcode me-1"></i>
+                    Kelola QR Code
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Analytics Dashboard
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Lihat laporan penjualan dan analytics restoran secara real-time.
+                </p>
+                <a href="/menu/analytics/" class="btn btn-success">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Lihat Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Cara Penggunaan
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Kelola data master seperti meja, kategori menu, dan menu items melalui Django Admin.
+                </p>
+                <a href="/admin/" class="btn btn-dark" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i>
+                    Buka Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Cara Penggunaan
+                </h5>
+            </div>
+            <div class="card-body">
+                <ol class="small">
+                    <li>Setup data meja dan menu melalui <strong>Admin Panel</strong></li>
+                    <li>Generate QR Code yang mengarah ke URL menu per meja</li>
+                    <li>Pelanggan scan QR → pilih menu → checkout</li>
+                    <li>Dapur melihat pesanan di <strong>Kitchen Display</strong></li>
+                    <li>Kasir proses pembayaran di <strong>Dashboard Kasir</strong></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-success" role="alert">
+            <h6 class="alert-heading">
+                <i class="fas fa-rocket me-2"></i>
+                MVP Ready!
+            </h6>
+            <p class="mb-0">
+                Sistem telah siap digunakan untuk operasional restoran. Untuk penggunaan pertama kali, 
+                silakan setup data master melalui Admin Panel terlebih dahulu.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

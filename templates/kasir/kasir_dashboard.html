@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Kasir{% endblock %}
+
+{% block nav_title %}
+    <i class="fas fa-cash-register me-2"></i>Dashboard Kasir
+{% endblock %}
+
+{% block nav_items %}
+<div class="navbar-nav ms-auto">
+    <a class="nav-link" href="{% url 'kasir:dapur' %}">
+        <i class="fas fa-fire me-1"></i>Dapur
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-search me-2"></i>
+                    Cari Pesanan Berdasarkan Meja
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="">
+                    <div class="mb-3">
+                        <label for="nomor_meja" class="form-label">Nomor Meja</label>
+                        <input type="text" class="form-control form-control-lg" id="nomor_meja" name="nomor_meja" placeholder="Contoh: 1, A1, VIP01" required>
+                        <div class="form-text">Masukkan nomor meja untuk melihat pesanan yang belum dibayar</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search me-2"></i>
+                        Cari Pesanan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <h6 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>
+                Petunjuk Penggunaan:
+            </h6>
+            <ul class="mb-0">
+                <li>Masukkan nomor meja untuk melihat semua pesanan yang belum dibayar</li>
+                <li>Sistem akan menampilkan detail pesanan beserta total yang harus dibayar</li>
+                <li>Tandai pesanan sebagai "Dibayar" setelah pelanggan melunasi pembayaran</li>
+                <li>Untuk melihat pesanan di dapur, gunakan menu <a href="{% url 'kasir:dapur' %}" class="alert-link">Kitchen Display System</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-utensils fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Menu Management</h5>
+                <p class="card-text">Kelola menu dan kategori melalui admin panel</p>
+                <a href="/admin/" class="btn btn-outline-primary" target="_blank">
+                    <i class="fas fa-external-link-alt me-1"></i>
+                    Buka Admin
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-fire fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Kitchen Display</h5>
+                <p class="card-text">Monitor pesanan yang masuk dan sedang diproses</p>
+                <a href="{% url 'kasir:dapur' %}" class="btn btn-outline-warning">
+                    <i class="fas fa-eye me-1"></i>
+                    Lihat Dapur
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-cash-register fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Pembayaran</h5>
+                <p class="card-text">Proses pembayaran pesanan pelanggan</p>
+                <button class="btn btn-outline-success" onclick="document.getElementById('nomor_meja').focus()">
+                    <i class="fas fa-dollar-sign me-1"></i>
+                    Mulai Kasir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Handle form submission with JavaScript for better UX
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const nomorMeja = document.getElementById('nomor_meja').value.trim();
+    
+    if (!nomorMeja) {
+        showToast('warning', 'Silakan masukkan nomor meja');
+        return;
+    }
+    
+    // Redirect to detail page
+    window.location.href = `/kasir/kasir_meja/${encodeURIComponent(nomorMeja)}/`;
+});
+
+function showToast(type, message) {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger'} border-0 position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = document.body.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+// Auto focus on nomor meja input
+document.getElementById('nomor_meja').focus();
+</script>
+{% endblock %}

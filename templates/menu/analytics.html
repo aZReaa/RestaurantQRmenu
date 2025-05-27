@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block nav_title %}
+    <i class="fas fa-chart-line me-2"></i>Analytics Dashboard
+{% endblock %}
+
+{% block nav_items %}
+<div class="navbar-nav ms-auto">
+    <a class="nav-link" href="/">
+        <i class="fas fa-home me-1"></i>Home
+    </a>
+    <a class="nav-link" href="/admin/" target="_blank">
+        <i class="fas fa-cog me-1"></i>Admin
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Pesanan Hari Ini</h6>
+                        <h3 class="mb-0">{{ today_summary.total_pesanan|default:0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-shopping-cart fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Pendapatan Hari Ini</h6>
+                        <h3 class="mb-0">Rp {{ today_summary.total_pendapatan|default:0|floatformat:0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Item Terjual Hari Ini</h6>
+                        <h3 class="mb-0">{{ today_summary.total_item_terjual|default:0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-box fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Rata-rata per Pesanan</h6>
+                        <h3 class="mb-0">Rp {{ today_summary.rata_rata_per_pesanan|default:0|floatformat:0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-calculator fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Daily Sales Chart -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Pendapatan 7 Hari Terakhir
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailySalesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Weekly Summary -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calendar-week me-2"></i>
+                    Ringkasan 7 Hari
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-12 mb-3">
+                        <h6 class="text-muted">Total Pesanan</h6>
+                        <h4 class="text-primary">{{ week_summary.total_pesanan|default:0 }}</h4>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <h6 class="text-muted">Total Pendapatan</h6>
+                        <h4 class="text-success">Rp {{ week_summary.total_pendapatan|default:0|floatformat:0 }}</h4>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="text-muted">Total Item Terjual</h6>
+                        <h4 class="text-info">{{ week_summary.total_item_terjual|default:0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Tables Row -->
+<div class="row">
+    <!-- Top Menu Today -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-fire me-2"></i>
+                    Menu Terlaris Hari Ini
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if today_menu_analytics %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Menu</th>
+                                    <th class="text-center">Terjual</th>
+                                    <th class="text-end">Pendapatan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for analytics in today_menu_analytics %}
+                                <tr>
+                                    <td>{{ analytics.menu_item.nama }}</td>
+                                    <td class="text-center">{{ analytics.jumlah_terjual }}</td>
+                                    <td class="text-end">Rp {{ analytics.total_pendapatan|floatformat:0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                        <p>Belum ada data penjualan hari ini</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Menu This Week -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-trophy me-2"></i>
+                    Top Menu 7 Hari Terakhir
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if top_menu_week %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Menu</th>
+                                    <th class="text-center">Terjual</th>
+                                    <th class="text-end">Pendapatan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for menu in top_menu_week %}
+                                <tr>
+                                    <td>{{ menu.menu_item__nama }}</td>
+                                    <td class="text-center">{{ menu.total_terjual }}</td>
+                                    <td class="text-end">Rp {{ menu.total_pendapatan|floatformat:0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                        <p>Belum ada data penjualan minggu ini</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Reports Table -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-table me-2"></i>
+                    Laporan Harian (7 Hari Terakhir)
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if daily_reports %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th class="text-center">Total Pesanan</th>
+                                    <th class="text-center">Item Terjual</th>
+                                    <th class="text-end">Total Pendapatan</th>
+                                    <th class="text-end">Rata-rata per Pesanan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in daily_reports %}
+                                <tr>
+                                    <td>{{ report.tanggal|date:"d/m/Y" }}</td>
+                                    <td class="text-center">{{ report.total_pesanan }}</td>
+                                    <td class="text-center">{{ report.total_item_terjual }}</td>
+                                    <td class="text-end">Rp {{ report.total_pendapatan|floatformat:0 }}</td>
+                                    <td class="text-end">Rp {{ report.rata_rata_per_pesanan|floatformat:0 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-file-alt fa-3x mb-3"></i>
+                        <p>Belum ada laporan harian</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Daily Sales Chart
+const ctx = document.getElementById('dailySalesChart').getContext('2d');
+const dailySalesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for report in daily_reports %}
+                '{{ report.tanggal|date:"d/m" }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Pendapatan (Rp)',
+            data: [
+                {% for report in daily_reports %}
+                    {{ report.total_pendapatan|default:0 }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.1,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value, index, values) {
+                        return 'Rp ' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
