@@ -3,92 +3,183 @@
 {% block title %}Menu - Meja {{ meja.nomor_meja }}{% endblock %}
 
 {% block nav_title %}
-    Menu - Meja {{ meja.nomor_meja }}
+    Menu Digital - Meja {{ meja.nomor_meja }}
+{% endblock %}
+
+{% block nav_items %}
+<div class="flex items-center space-x-4">
+    <div class="text-white flex items-center px-4 py-2 bg-white/10 rounded-lg">
+        <i class="fas fa-table mr-2"></i>Meja {{ meja.nomor_meja }}
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="alert alert-info" role="alert">
-            <i class="fas fa-info-circle me-2"></i>
-            Selamat datang di <strong>Meja {{ meja.nomor_meja }}</strong>! Pilih menu favorit Anda dan tambahkan ke keranjang.
-        </div>
+<!-- Welcome Section -->
+<div class="text-center mb-12 animate-fade-in">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 rounded-3xl shadow-2xl mb-6 floating-element">
+        <i class="fas fa-utensils text-white text-3xl"></i>
+    </div>
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Selamat Datang!</h1>
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6 max-w-2xl mx-auto">
+        <p class="text-lg text-gray-700">
+            <i class="fas fa-table text-blue-600 mr-2"></i>
+            Anda berada di <strong class="text-blue-600">Meja {{ meja.nomor_meja }}</strong>
+        </p>
+        <p class="text-gray-600 mt-2">Pilih menu favorit Anda dan nikmati pengalaman dining yang tak terlupakan!</p>
     </div>
 </div>
 
 {% if menu_items_by_category %}
     {% for kategori, menu_items in menu_items_by_category.items %}
-    <div class="row mb-4">
-        <div class="col-12">
-            <h3 class="text-primary border-bottom pb-2">
-                <i class="fas fa-list me-2"></i>{{ kategori.nama }}
-            </h3>
+    <!-- Category Section -->
+    <div class="mb-16 animate-slide-up" style="animation-delay: {{ forloop.counter0|mul:0.1 }}s;">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-3">
+                <i class="fas fa-list text-blue-600 mr-3"></i>{{ kategori.nama }}
+            </h2>
             {% if kategori.deskripsi %}
-                <p class="text-muted">{{ kategori.deskripsi }}</p>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">{{ kategori.deskripsi }}</p>
             {% endif %}
+            <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-green-500 mx-auto mt-4 rounded-full"></div>
         </div>
-    </div>
 
-    <div class="row">
-        {% for item in menu_items %}
-        <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card menu-item-card h-100">
+        <!-- Menu Items Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for item in menu_items %}
+            <div class="bg-white rounded-2xl shadow-xl card-hover overflow-hidden animate-slide-up" style="animation-delay: {{ forloop.counter0|mul:0.05 }}s;">
+                <!-- Image Section -->
                 {% if item.gambar %}
-                    <img src="{{ item.gambar.url }}" class="card-img-top" alt="{{ item.nama }}" style="height: 200px; object-fit: cover;">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{{ item.gambar.url }}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110" alt="{{ item.nama }}">
+                        <div class="absolute inset-0 bg-black/20"></div>
+                    </div>
                 {% else %}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-image text-muted fa-3x"></i>
+                    <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <i class="fas fa-utensils text-gray-400 text-4xl"></i>
                     </div>
                 {% endif %}
                 
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ item.nama }}</h5>
+                <!-- Content Section -->
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ item.nama }}</h3>
                     
                     {% if item.deskripsi %}
-                        <p class="card-text text-muted small">{{ item.deskripsi }}</p>
+                        <p class="text-gray-600 text-sm mb-4">{{ item.deskripsi }}</p>
                     {% endif %}
                     
-                    <div class="mt-auto">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="h5 text-success mb-0">Rp {{ item.harga|floatformat:0 }}</span>
-                        </div>
-                        
-                        <div class="input-group mb-2">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="decreaseQuantity({{ item.id }})">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input type="number" class="form-control text-center" id="qty-{{ item.id }}" value="1" min="1" max="99">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity({{ item.id }})">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        
-                        <input type="text" class="form-control form-control-sm mb-2" id="note-{{ item.id }}" placeholder="Catatan khusus (opsional)">
-                        
-                        <button class="btn btn-primary w-100" onclick="addToCart({{ item.id }}, '{{ item.nama }}', {{ item.harga }})">
-                            <i class="fas fa-cart-plus me-1"></i>
-                            Tambah ke Keranjang
+                    <!-- Price -->
+                    <div class="text-2xl font-bold text-green-600 mb-6">Rp {{ item.harga|floatformat:0 }}</div>
+                    
+                    <!-- Quantity Controls -->
+                    <div class="flex items-center justify-center mb-4 bg-gray-50 rounded-xl p-3">
+                        <button class="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-colors duration-200" 
+                                onclick="decreaseQuantity({{ item.id }})">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" 
+                               class="w-16 text-center mx-4 py-2 border border-gray-300 rounded-lg font-semibold text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                               id="qty-{{ item.id }}" 
+                               value="1" 
+                               min="1" 
+                               max="99">
+                        <button class="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center justify-center transition-colors duration-200" 
+                                onclick="increaseQuantity({{ item.id }})">
+                            <i class="fas fa-plus"></i>
                         </button>
                     </div>
+                    
+                    <!-- Notes Input -->
+                    <input type="text" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4" 
+                           id="note-{{ item.id }}" 
+                           placeholder="Catatan khusus (opsional)">                    
+                    <!-- Add to Cart Button -->
+                    <button class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold w-full hover:shadow-lg transition-all duration-300 text-lg" 
+                            onclick="addToCart({{ item.id }}, '{{ item.nama }}', {{ item.harga }})">
+                        <i class="fas fa-cart-plus mr-2"></i>
+                        Tambah ke Keranjang
+                    </button>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
     {% endfor %}
 {% else %}
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-warning" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                Maaf, saat ini belum ada menu yang tersedia.
-            </div>
+    <!-- No Menu Available -->
+    <div class="text-center py-16">
+        <div class="w-24 h-24 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-utensils text-gray-400 text-4xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Menu Tidak Tersedia</h3>
+        <p class="text-gray-600 text-lg">Maaf, saat ini belum ada menu yang tersedia untuk ditampilkan.</p>
+        <div class="mt-8">
+            <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200">
+                <i class="fas fa-home mr-2"></i>Kembali ke Beranda
+            </a>
         </div>
     </div>
 {% endif %}
 
 <!-- Floating Cart Button -->
-<div class="floating-cart">
+<div class="fixed bottom-6 right-6 z-50" id="floating-cart">
+    <button class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 relative" 
+            onclick="toggleCart()">
+        <i class="fas fa-shopping-cart text-xl"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold" 
+              id="cart-count" style="display: none;">0</span>
+    </button>
+</div>
+
+<!-- Cart Sidebar -->
+<div class="fixed inset-0 z-50 overflow-hidden" id="cart-sidebar" style="display: none;">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50" onclick="toggleCart()"></div>
+    
+    <!-- Sidebar -->
+    <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transform translate-x-full transition-transform duration-300" id="cart-content">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">
+                    <i class="fas fa-shopping-cart mr-2"></i>Keranjang Belanja
+                </h3>
+                <button onclick="toggleCart()" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <p class="text-green-100 mt-2">Meja {{ meja.nomor_meja }}</p>
+        </div>
+        
+        <!-- Cart Items -->
+        <div class="flex-1 overflow-y-auto p-6" id="cart-items">
+            <div class="text-center text-gray-500 py-8" id="empty-cart">
+                <i class="fas fa-shopping-cart text-4xl mb-4"></i>
+                <p>Keranjang masih kosong</p>
+            </div>
+        </div>
+        
+        <!-- Footer / Checkout -->
+        <div class="border-t p-6 bg-gray-50" id="cart-footer" style="display: none;">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-lg font-semibold">Total:</span>
+                <span class="text-2xl font-bold text-green-600" id="cart-total">Rp 0</span>
+            </div>
+            
+            <textarea class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-4" 
+                      id="order-notes" 
+                      rows="3" 
+                      placeholder="Catatan untuk pesanan (opsional)"></textarea>
+            
+            <button class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold w-full hover:shadow-lg transition-all duration-300" 
+                    onclick="submitOrder()">
+                <i class="fas fa-check mr-2"></i>
+                Pesan Sekarang
+            </button>
+        </div>
+    </div>
+</div>
     <button class="btn btn-success btn-lg rounded-circle" data-bs-toggle="modal" data-bs-target="#cartModal" style="width: 60px; height: 60px;">
         <i class="fas fa-shopping-cart"></i>
         <span class="cart-badge" id="cart-count">0</span>
@@ -141,23 +232,34 @@
 </div>
 
 <!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-check-circle me-2"></i>
-                    Pesanan Berhasil!
-                </h5>
+<div class="fixed inset-0 z-50 overflow-hidden" id="success-modal" style="display: none;">
+    <div class="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-bounce-in">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-t-2xl p-6 text-white text-center">
+                <i class="fas fa-check-circle text-4xl mb-4"></i>
+                <h3 class="text-2xl font-bold">Pesanan Berhasil!</h3>
             </div>
-            <div class="modal-body text-center">
-                <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
-                <h4>Terima Kasih!</h4>
-                <p>Pesanan Anda telah berhasil dikirim ke dapur. Silakan tunggu makanan Anda disiapkan.</p>
-                <p class="text-muted small">Nomor Pesanan: <span id="order-number"></span></p>
+            
+            <div class="p-6 text-center">
+                <h4 class="text-xl font-bold text-gray-900 mb-4">Terima Kasih!</h4>
+                <p class="text-gray-600 mb-4">
+                    Pesanan Anda telah berhasil dikirim ke dapur. Silakan tunggu makanan Anda disiapkan.
+                </p>
+                <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                    <p class="text-sm text-gray-600">Nomor Pesanan:</p>
+                    <p class="text-lg font-bold text-green-600" id="order-number">#123</p>
+                </div>
+                
+                <button onclick="closeSuccessModal(); location.reload()" 
+                        class="btn-gradient text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+                    <i class="fas fa-utensils mr-2"></i>
+                    Pesan Lagi
+                </button>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" onclick="location.reload()">
+        </div>
+    </div>
+</div>
+{% endblock %}
                     <i class="fas fa-redo me-1"></i>Pesan Lagi
                 </button>
             </div>
@@ -186,17 +288,285 @@ function addToCart(itemId, itemName, itemPrice) {
     const quantity = parseInt(document.getElementById(`qty-${itemId}`).value);
     const note = document.getElementById(`note-${itemId}`).value;
     
-    // Cek apakah item sudah ada di keranjang
+    // Check if item already exists in cart
     const existingItemIndex = cart.findIndex(item => item.id === itemId);
     
     if (existingItemIndex !== -1) {
-        // Update quantity jika sudah ada
+        // Update quantity if exists
         cart[existingItemIndex].jumlah += quantity;
         cart[existingItemIndex].subtotal = cart[existingItemIndex].jumlah * cart[existingItemIndex].harga;
         if (note) {
             cart[existingItemIndex].catatan = note;
         }
     } else {
+        // Add new item
+        cart.push({
+            id: itemId,
+            nama: itemName,
+            harga: itemPrice,
+            jumlah: quantity,
+            catatan: note,
+            subtotal: itemPrice * quantity
+        });
+    }
+    
+    // Reset form
+    document.getElementById(`qty-${itemId}`).value = 1;
+    document.getElementById(`note-${itemId}`).value = '';
+    
+    updateCartDisplay();
+    showToast('success', `${itemName} ditambahkan ke keranjang!`);
+}
+
+function removeFromCart(itemId) {
+    cart = cart.filter(item => item.id !== itemId);
+    updateCartDisplay();
+    showToast('info', 'Item dihapus dari keranjang');
+}
+
+function updateCartQuantity(itemId, newQuantity) {
+    const itemIndex = cart.findIndex(item => item.id === itemId);
+    if (itemIndex !== -1) {
+        if (newQuantity <= 0) {
+            removeFromCart(itemId);
+        } else {
+            cart[itemIndex].jumlah = newQuantity;
+            cart[itemIndex].subtotal = cart[itemIndex].harga * newQuantity;
+            updateCartDisplay();
+        }
+    }
+}
+
+function updateCartDisplay() {
+    const cartCount = document.getElementById('cart-count');
+    const cartItems = document.getElementById('cart-items');
+    const cartFooter = document.getElementById('cart-footer');
+    const emptyCart = document.getElementById('empty-cart');
+    const cartTotal = document.getElementById('cart-total');
+    
+    // Update cart count
+    const totalItems = cart.reduce((total, item) => total + item.jumlah, 0);
+    if (totalItems > 0) {
+        cartCount.textContent = totalItems;
+        cartCount.style.display = 'flex';
+    } else {
+        cartCount.style.display = 'none';
+    }
+    
+    // Update cart items display
+    if (cart.length === 0) {
+        emptyCart.style.display = 'block';
+        cartFooter.style.display = 'none';
+        cartItems.innerHTML = `
+            <div class="text-center text-gray-500 py-8" id="empty-cart">
+                <i class="fas fa-shopping-cart text-4xl mb-4"></i>
+                <p>Keranjang masih kosong</p>
+            </div>
+        `;
+    } else {
+        emptyCart.style.display = 'none';
+        cartFooter.style.display = 'block';
+        
+        let cartHTML = '';
+        let total = 0;
+        
+        cart.forEach(item => {
+            total += item.subtotal;
+            cartHTML += `
+                <div class="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-900">${item.nama}</h4>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateCartQuantity(${item.id}, ${item.jumlah - 1})" 
+                                    class="w-8 h-8 bg-red-500 text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="w-8 text-center font-semibold">${item.jumlah}</span>
+                            <button onclick="updateCartQuantity(${item.id}, ${item.jumlah + 1})" 
+                                    class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-gray-600">Rp ${item.harga.toLocaleString()} × ${item.jumlah}</div>
+                            <div class="font-bold text-green-600">Rp ${item.subtotal.toLocaleString()}</div>
+                        </div>
+                    </div>
+                    
+                    ${item.catatan ? `<div class="text-sm text-gray-600 mt-2"><i class="fas fa-sticky-note mr-1"></i>${item.catatan}</div>` : ''}
+                </div>
+            `;
+        });
+        
+        cartItems.innerHTML = cartHTML;
+        cartTotal.textContent = `Rp ${total.toLocaleString()}`;
+    }
+}
+
+function toggleCart() {
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const cartContent = document.getElementById('cart-content');
+    
+    if (cartSidebar.style.display === 'none') {
+        cartSidebar.style.display = 'block';
+        setTimeout(() => {
+            cartContent.classList.remove('translate-x-full');
+        }, 10);
+    } else {
+        cartContent.classList.add('translate-x-full');
+        setTimeout(() => {
+            cartSidebar.style.display = 'none';
+        }, 300);
+    }
+}
+
+function submitOrder() {
+    if (cart.length === 0) {
+        showToast('warning', 'Keranjang masih kosong!');
+        return;
+    }
+    
+    const orderNotes = document.getElementById('order-notes').value;
+    const orderData = {
+        meja_id: {{ meja.id }},
+        items: cart,
+        catatan: orderNotes
+    };
+    
+    // Show loading
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+    button.disabled = true;
+    
+    fetch('{% url "menu:submit_order" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Clear cart
+            cart = [];
+            updateCartDisplay();
+            toggleCart();
+            
+            // Show success modal
+            document.getElementById('order-number').textContent = `#${data.pesanan_id}`;
+            showSuccessModal();
+        } else {
+            throw new Error(data.message || 'Terjadi kesalahan');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('error', 'Gagal mengirim pesanan. Silakan coba lagi.');
+        
+        // Restore button
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+function showSuccessModal() {
+    document.getElementById('success-modal').style.display = 'block';
+}
+
+function closeSuccessModal() {
+    document.getElementById('success-modal').style.display = 'none';
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(type, message) {
+    const colors = {
+        'success': 'bg-green-500',
+        'error': 'bg-red-500',
+        'warning': 'bg-yellow-500',
+        'info': 'bg-blue-500'
+    };
+    
+    const icons = {
+        'success': 'check-circle',
+        'error': 'exclamation-circle',
+        'warning': 'exclamation-triangle',
+        'info': 'info-circle'
+    };
+    
+    const toastHtml = `
+        <div class="fixed top-4 right-4 z-50 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-x-full opacity-0" id="toast-${Date.now()}">
+            <div class="flex items-center">
+                <i class="fas fa-${icons[type]} mr-3"></i>
+                <span>${message}</span>
+                <button onclick="closeToast(this.parentElement.parentElement)" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    const toast = document.body.lastElementChild;
+    
+    // Animate in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+    }, 100);
+    
+    // Auto remove
+    setTimeout(() => {
+        closeToast(toast);
+    }, 4000);
+}
+
+function closeToast(toast) {
+    if (toast) {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartDisplay();
+    
+    // Close cart when clicking outside
+    document.addEventListener('click', function(e) {
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const floatingCart = document.getElementById('floating-cart');
+        
+        if (cartSidebar.style.display !== 'none' && 
+            !e.target.closest('#cart-content') && 
+            !e.target.closest('#floating-cart')) {
+            toggleCart();
+        }
+    });
+});
+</script>
+{% endblock %}
         // Tambah item baru
         cart.push({
             id: itemId,

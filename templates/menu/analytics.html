@@ -3,263 +3,249 @@
 {% block title %}Analytics Dashboard{% endblock %}
 
 {% block nav_title %}
-    <i class="fas fa-chart-line me-2"></i>Analytics Dashboard
+    Analytics Dashboard
 {% endblock %}
 
 {% block nav_items %}
-<div class="navbar-nav ms-auto">
-    <a class="nav-link" href="/">
-        <i class="fas fa-home me-1"></i>Home
+<div class="flex items-center space-x-4">
+    <a href="/" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-home mr-2"></i>Home
     </a>
-    <a class="nav-link" href="/admin/" target="_blank">
-        <i class="fas fa-cog me-1"></i>Admin
+    <a href="/admin/" target="_blank" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-cog mr-2"></i>Admin
     </a>
 </div>
 {% endblock %}
 
 {% block content %}
+<!-- Header Section -->
+<div class="text-center mb-12 animate-fade-in">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-800 rounded-3xl shadow-2xl mb-6 floating-element">
+        <i class="fas fa-chart-line text-white text-3xl"></i>
+    </div>
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Analytics Dashboard</h1>
+    <p class="text-xl text-gray-600">Monitor kinerja dan analisis penjualan restoran</p>
+</div>
+
 <!-- Summary Cards -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Pesanan Hari Ini</h6>
-                        <h3 class="mb-0">{{ today_summary.total_pesanan|default:0 }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-shopping-cart fa-2x"></i>
-                    </div>
-                </div>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <!-- Today's Orders -->
+    <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-blue-200 text-sm font-medium">Pesanan Hari Ini</p>
+                <h3 class="text-3xl font-bold mt-2">{{ today_summary.total_pesanan|default:0 }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fas fa-shopping-cart text-2xl"></i>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Pendapatan Hari Ini</h6>
-                        <h3 class="mb-0">Rp {{ today_summary.total_pendapatan|default:0|floatformat:0 }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-money-bill-wave fa-2x"></i>
-                    </div>
-                </div>
+
+    <!-- Today's Revenue -->
+    <div class="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up" style="animation-delay: 0.1s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-green-200 text-sm font-medium">Pendapatan Hari Ini</p>
+                <h3 class="text-3xl font-bold mt-2">Rp {{ today_summary.total_pendapatan|default:0|floatformat:0 }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fas fa-money-bill-wave text-2xl"></i>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Item Terjual Hari Ini</h6>
-                        <h3 class="mb-0">{{ today_summary.total_item_terjual|default:0 }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-box fa-2x"></i>
-                    </div>
-                </div>
+
+    <!-- Items Sold Today -->
+    <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-purple-200 text-sm font-medium">Item Terjual Hari Ini</p>
+                <h3 class="text-3xl font-bold mt-2">{{ today_summary.total_item_terjual|default:0 }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fas fa-box text-2xl"></i>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Rata-rata per Pesanan</h6>
-                        <h3 class="mb-0">Rp {{ today_summary.rata_rata_per_pesanan|default:0|floatformat:0 }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-calculator fa-2x"></i>
-                    </div>
-                </div>
+
+    <!-- Average per Order -->
+    <div class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-2xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up" style="animation-delay: 0.3s;">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-orange-200 text-sm font-medium">Rata-rata per Pesanan</p>
+                <h3 class="text-3xl font-bold mt-2">Rp {{ today_summary.rata_rata_per_pesanan|default:0|floatformat:0 }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <i class="fas fa-calculator text-2xl"></i>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Charts Row -->
-<div class="row mb-4">
+<!-- Charts Section -->
+<div class="grid lg:grid-cols-3 gap-8 mb-12">
     <!-- Daily Sales Chart -->
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-line me-2"></i>
-                    Pendapatan 7 Hari Terakhir
-                </h5>
+    <div class="lg:col-span-2 bg-white rounded-3xl shadow-2xl p-8 animate-slide-up" style="animation-delay: 0.4s;">
+        <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl flex items-center justify-center mr-4">
+                <i class="fas fa-chart-line text-white text-xl"></i>
             </div>
-            <div class="card-body">
-                <canvas id="dailySalesChart" width="400" height="200"></canvas>
-            </div>
+            <h3 class="text-2xl font-bold text-gray-900">Pendapatan 7 Hari Terakhir</h3>
+        </div>
+        <div class="h-80">
+            <canvas id="dailySalesChart" class="w-full h-full"></canvas>
         </div>
     </div>
-    
+
     <!-- Weekly Summary -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-calendar-week me-2"></i>
-                    Ringkasan 7 Hari
-                </h5>
+    <div class="bg-white rounded-3xl shadow-2xl p-8 animate-slide-up" style="animation-delay: 0.5s;">
+        <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-green-600 to-green-800 rounded-xl flex items-center justify-center mr-4">
+                <i class="fas fa-calendar-week text-white text-xl"></i>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-12 mb-3">
-                        <h6 class="text-muted">Total Pesanan</h6>
-                        <h4 class="text-primary">{{ week_summary.total_pesanan|default:0 }}</h4>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <h6 class="text-muted">Total Pendapatan</h6>
-                        <h4 class="text-success">Rp {{ week_summary.total_pendapatan|default:0|floatformat:0 }}</h4>
-                    </div>
-                    <div class="col-12">
-                        <h6 class="text-muted">Total Item Terjual</h6>
-                        <h4 class="text-info">{{ week_summary.total_item_terjual|default:0 }}</h4>
-                    </div>
-                </div>
+            <h3 class="text-2xl font-bold text-gray-900">Ringkasan 7 Hari</h3>
+        </div>
+        <div class="space-y-6">
+            <div class="bg-blue-50 rounded-2xl p-6 text-center">
+                <p class="text-blue-600 font-medium mb-2">Total Pesanan</p>
+                <h4 class="text-3xl font-bold text-blue-900">{{ week_summary.total_pesanan|default:0 }}</h4>
+            </div>
+            <div class="bg-green-50 rounded-2xl p-6 text-center">
+                <p class="text-green-600 font-medium mb-2">Total Pendapatan</p>
+                <h4 class="text-3xl font-bold text-green-900">Rp {{ week_summary.total_pendapatan|default:0|floatformat:0 }}</h4>
+            </div>
+            <div class="bg-purple-50 rounded-2xl p-6 text-center">
+                <p class="text-purple-600 font-medium mb-2">Total Item Terjual</p>
+                <h4 class="text-3xl font-bold text-purple-900">{{ week_summary.total_item_terjual|default:0 }}</h4>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Data Tables Row -->
-<div class="row">
+<!-- Top Menu Tables -->
+<div class="grid lg:grid-cols-2 gap-8 mb-12">
     <!-- Top Menu Today -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-fire me-2"></i>
-                    Menu Terlaris Hari Ini
-                </h5>
-            </div>
-            <div class="card-body">
-                {% if today_menu_analytics %}
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Menu</th>
-                                    <th class="text-center">Terjual</th>
-                                    <th class="text-end">Pendapatan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for analytics in today_menu_analytics %}
-                                <tr>
-                                    <td>{{ analytics.menu_item.nama }}</td>
-                                    <td class="text-center">{{ analytics.jumlah_terjual }}</td>
-                                    <td class="text-end">Rp {{ analytics.total_pendapatan|floatformat:0 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden animate-slide-up" style="animation-delay: 0.6s;">
+        <div class="bg-gradient-to-r from-red-600 to-red-700 p-6">
+            <h3 class="text-white text-2xl font-bold flex items-center">
+                <i class="fas fa-fire mr-3"></i>
+                Menu Terlaris Hari Ini
+            </h3>
+        </div>
+        <div class="p-6">
+            {% if today_menu_analytics %}
+                <div class="space-y-3">
+                    {% for analytics in today_menu_analytics %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-red-600 to-red-700 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                {{ forloop.counter }}
+                            </div>
+                            <h4 class="font-semibold text-gray-900">{{ analytics.menu_item.nama }}</h4>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-bold text-gray-900">{{ analytics.jumlah_terjual }} sold</p>
+                            <p class="text-sm text-gray-600">Rp {{ analytics.total_pendapatan|floatformat:0 }}</p>
+                        </div>
                     </div>
-                {% else %}
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
-                        <p>Belum ada data penjualan hari ini</p>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-gray-400 text-2xl"></i>
                     </div>
-                {% endif %}
-            </div>
+                    <p class="text-gray-500">Belum ada data penjualan hari ini</p>
+                </div>
+            {% endif %}
         </div>
     </div>
-    
+
     <!-- Top Menu This Week -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-trophy me-2"></i>
-                    Top Menu 7 Hari Terakhir
-                </h5>
-            </div>
-            <div class="card-body">
-                {% if top_menu_week %}
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Menu</th>
-                                    <th class="text-center">Terjual</th>
-                                    <th class="text-end">Pendapatan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for menu in top_menu_week %}
-                                <tr>
-                                    <td>{{ menu.menu_item__nama }}</td>
-                                    <td class="text-center">{{ menu.total_terjual }}</td>
-                                    <td class="text-end">Rp {{ menu.total_pendapatan|floatformat:0 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden animate-slide-up" style="animation-delay: 0.7s;">
+        <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 p-6">
+            <h3 class="text-white text-2xl font-bold flex items-center">
+                <i class="fas fa-trophy mr-3"></i>
+                Top Menu 7 Hari Terakhir
+            </h3>
+        </div>
+        <div class="p-6">
+            {% if top_menu_week %}
+                <div class="space-y-3">
+                    {% for menu in top_menu_week %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                {{ forloop.counter }}
+                            </div>
+                            <h4 class="font-semibold text-gray-900">{{ menu.menu_item__nama }}</h4>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-bold text-gray-900">{{ menu.total_terjual }} sold</p>
+                            <p class="text-sm text-gray-600">Rp {{ menu.total_pendapatan|floatformat:0 }}</p>
+                        </div>
                     </div>
-                {% else %}
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
-                        <p>Belum ada data penjualan minggu ini</p>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-gray-400 text-2xl"></i>
                     </div>
-                {% endif %}
-            </div>
+                    <p class="text-gray-500">Belum ada data penjualan minggu ini</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <!-- Daily Reports Table -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-table me-2"></i>
-                    Laporan Harian (7 Hari Terakhir)
-                </h5>
+<div class="bg-white rounded-3xl shadow-2xl overflow-hidden animate-slide-up" style="animation-delay: 0.8s;">
+    <div class="bg-gradient-to-r from-gray-700 to-gray-800 p-6">
+        <h3 class="text-white text-2xl font-bold flex items-center">
+            <i class="fas fa-table mr-3"></i>
+            Laporan Harian (7 Hari Terakhir)
+        </h3>
+    </div>
+    <div class="p-6">
+        {% if daily_reports %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200">
+                            <th class="text-left py-4 px-4 font-semibold text-gray-900">Tanggal</th>
+                            <th class="text-center py-4 px-4 font-semibold text-gray-900">Total Pesanan</th>
+                            <th class="text-center py-4 px-4 font-semibold text-gray-900">Item Terjual</th>
+                            <th class="text-right py-4 px-4 font-semibold text-gray-900">Total Pendapatan</th>
+                            <th class="text-right py-4 px-4 font-semibold text-gray-900">Rata-rata per Pesanan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in daily_reports %}
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+                            <td class="py-4 px-4 font-medium text-gray-900">{{ report.tanggal|date:"d/m/Y" }}</td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">{{ report.total_pesanan }}</span>
+                            </td>
+                            <td class="py-4 px-4 text-center">
+                                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-semibold">{{ report.total_item_terjual }}</span>
+                            </td>
+                            <td class="py-4 px-4 text-right font-bold text-green-600">Rp {{ report.total_pendapatan|floatformat:0 }}</td>
+                            <td class="py-4 px-4 text-right font-semibold text-gray-900">Rp {{ report.rata_rata_per_pesanan|floatformat:0 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body">
-                {% if daily_reports %}
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Tanggal</th>
-                                    <th class="text-center">Total Pesanan</th>
-                                    <th class="text-center">Item Terjual</th>
-                                    <th class="text-end">Total Pendapatan</th>
-                                    <th class="text-end">Rata-rata per Pesanan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for report in daily_reports %}
-                                <tr>
-                                    <td>{{ report.tanggal|date:"d/m/Y" }}</td>
-                                    <td class="text-center">{{ report.total_pesanan }}</td>
-                                    <td class="text-center">{{ report.total_item_terjual }}</td>
-                                    <td class="text-end">Rp {{ report.total_pendapatan|floatformat:0 }}</td>
-                                    <td class="text-end">Rp {{ report.rata_rata_per_pesanan|floatformat:0 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-file-alt fa-3x mb-3"></i>
-                        <p>Belum ada laporan harian</p>
-                    </div>
-                {% endif %}
+        {% else %}
+            <div class="text-center py-12">
+                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-file-alt text-gray-400 text-3xl"></i>
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900 mb-2">Belum Ada Laporan</h4>
+                <p class="text-gray-500">Belum ada laporan harian yang tersedia</p>
             </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -267,8 +253,14 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Daily Sales Chart
+// Daily Sales Chart with modern styling
 const ctx = document.getElementById('dailySalesChart').getContext('2d');
+
+// Create gradient
+const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
+gradient.addColorStop(1, 'rgba(59, 130, 246, 0.1)');
+
 const dailySalesChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -284,30 +276,84 @@ const dailySalesChart = new Chart(ctx, {
                     {{ report.total_pendapatan|default:0 }}{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ],
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.1)',
-            tension: 0.1,
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            pointBackgroundColor: 'rgb(59, 130, 246)',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 3,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            tension: 0.4,
             fill: true
         }]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#ffffff',
+                bodyColor: '#ffffff',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: false,
+                callbacks: {
+                    label: function(context) {
+                        return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                    }
+                }
             }
         },
         scales: {
-            y: {
-                beginAtZero: true,
+            x: {
+                grid: {
+                    display: false
+                },
                 ticks: {
-                    callback: function(value, index, values) {
-                        return 'Rp ' + value.toLocaleString();
+                    color: '#6B7280',
+                    font: {
+                        family: 'Inter, system-ui, sans-serif',
+                        size: 12
                     }
                 }
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(107, 114, 128, 0.1)'
+                },
+                ticks: {
+                    color: '#6B7280',
+                    font: {
+                        family: 'Inter, system-ui, sans-serif',
+                        size: 12
+                    },
+                    callback: function(value, index, values) {
+                        return 'Rp ' + value.toLocaleString('id-ID');
+                    }
+                }
+            }
+        },
+        interaction: {
+            intersect: false,
+            mode: 'index'
+        },
+        elements: {
+            point: {
+                hoverBorderWidth: 4
             }
         }
     }
 });
+
+// Add animation on load
+Chart.defaults.animation.duration = 2000;
+Chart.defaults.animation.easing = 'easeInOutQuart';
 </script>
 {% endblock %}

@@ -4,184 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt - Pesanan #{{ pesanan.id }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'receipt': ['Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 1.4;
-            margin: 0;
-            padding: 20px;
-            background: white;
-        }
-        .receipt {
-            max-width: 300px;
-            margin: 0 auto;
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 1px dashed #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .restaurant-name {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .receipt-info {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #333;
-            padding-bottom: 10px;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-        .items {
-            margin-bottom: 15px;
-        }
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            align-items: flex-start;
-        }
-        .item-name {
-            flex: 1;
-            margin-right: 10px;
-        }
-        .item-qty {
-            margin-right: 10px;
-            text-align: center;
-            min-width: 20px;
-        }
-        .item-price {
-            text-align: right;
-            min-width: 60px;
-        }
-        .total-section {
-            border-top: 1px dashed #333;
-            padding-top: 10px;
-            margin-top: 15px;
-        }
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        .grand-total {
-            font-weight: bold;
-            font-size: 14px;
-            border-top: 1px solid #333;
-            padding-top: 5px;
-            margin-top: 5px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 1px dashed #333;
-            font-size: 10px;
-        }
         @media print {
             body {
-                margin: 0;
-                padding: 0;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
             }
-            .receipt {
-                max-width: none;
-                border: none;
-                margin: 0;
-                padding: 10px;
+            .no-print {
+                display: none !important;
             }
+            .receipt-container {
+                max-width: none !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            /* Print specific styling */
+            .print-only {
+                display: block !important;
+            }
+            .screen-only {
+                display: none !important;
+            }
+        }
+        
+        @media screen {
+            .print-only {
+                display: none;
+            }
+            .screen-only {
+                display: block;
+            }
+        }
+        
+        .receipt-border {
+            border-style: dashed;
+            border-width: 1px;
+            border-color: #374151;
         }
     </style>
 </head>
-<body>
-    <div class="receipt">
-        <div class="header">
-            <div class="restaurant-name">GACOAN KW</div>
-            <div>Restoran QR Code</div>
-            <div>Jl. Contoh No. 123</div>
-            <div>Telp: (021) 1234567</div>
+<body class="bg-gray-100 font-receipt min-h-screen">
+    <!-- Print Actions (Screen Only) -->
+    <div class="screen-only no-print fixed top-4 right-4 z-10 space-x-2">
+        <button onclick="window.print()" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200">
+            <i class="fas fa-print mr-2"></i>Print
+        </button>
+        <button onclick="window.close()" 
+                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200">
+            <i class="fas fa-times mr-2"></i>Close
+        </button>
+    </div>
+
+    <!-- Receipt Container -->
+    <div class="flex items-center justify-center min-h-screen p-4 screen-only">
+        <div class="receipt-container bg-white shadow-2xl rounded-2xl overflow-hidden max-w-sm w-full">
+            <!-- Content will be here -->
+        </div>
+    </div>
+
+    <!-- Receipt Content (for both screen and print) -->
+    <div class="receipt-container max-w-sm mx-auto bg-white p-6 print:p-4 print:shadow-none print:rounded-none">
+        <!-- Header -->
+        <div class="text-center receipt-border border-b pb-4 mb-6">
+            <div class="mb-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mb-3 screen-only">
+                    <i class="fas fa-utensils text-white text-2xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-gray-900 mb-2">GACOAN KW</h1>
+                <p class="text-sm text-gray-600">Restoran QR Code</p>
+                <p class="text-xs text-gray-500">Jl. Contoh No. 123</p>
+                <p class="text-xs text-gray-500">Telp: (021) 1234567</p>
+            </div>
         </div>
 
-        <div class="receipt-info">
-            <div class="info-row">
-                <span>Receipt #:</span>
-                <span>{{ pesanan.id }}</span>
+        <!-- Receipt Info -->
+        <div class="receipt-border border-b pb-4 mb-6 space-y-2">
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Receipt #:</span>
+                <span class="font-semibold text-gray-900">#{{ pesanan.id }}</span>
             </div>
-            <div class="info-row">
-                <span>Meja:</span>
-                <span>{{ pesanan.meja.nomor_meja }}</span>
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Meja:</span>
+                <span class="font-semibold text-gray-900">{{ pesanan.meja.nomor_meja }}</span>
             </div>
-            <div class="info-row">
-                <span>Tanggal:</span>
-                <span>{{ pesanan.created_at|date:"d/m/Y H:i" }}</span>
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Tanggal:</span>
+                <span class="font-semibold text-gray-900">{{ pesanan.created_at|date:"d/m/Y H:i" }}</span>
             </div>
-            <div class="info-row">
-                <span>Kasir:</span>
-                <span>Admin</span>
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Kasir:</span>
+                <span class="font-semibold text-gray-900">Admin</span>
             </div>
-            <div class="info-row">
-                <span>Print:</span>
-                <span>{{ print_time|date:"d/m/Y H:i" }}</span>
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Print:</span>
+                <span class="font-semibold text-gray-900">{{ print_time|date:"d/m/Y H:i" }}</span>
             </div>
         </div>
 
-        <div class="items">
-            <div class="item-row" style="font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 8px;">
-                <div class="item-name">Item</div>
-                <div class="item-qty">Qty</div>
-                <div class="item-price">Harga</div>
-            </div>
-            {% for detail in detail_pesanan %}            <div class="item-row">
-                <div class="item-name">{{ detail.menu_item.nama }}</div>
-                <div class="item-qty">{{ detail.jumlah }}x</div>
-                <div class="item-price">Rp {{ detail.subtotal|floatformat:0 }}</div>
-            </div>
-            <div class="item-row" style="margin-top: -3px; margin-bottom: 8px;">
-                <div class="item-name" style="font-size: 11px; color: #666; margin-left: 10px;">
+        <!-- Items Header -->
+        <div class="grid grid-cols-12 gap-2 text-xs font-semibold text-gray-700 border-b border-gray-300 pb-2 mb-4">
+            <div class="col-span-6">Item</div>
+            <div class="col-span-2 text-center">Qty</div>
+            <div class="col-span-4 text-right">Harga</div>
+        </div>
+
+        <!-- Items List -->
+        <div class="space-y-3 mb-6">
+            {% for detail in detail_pesanan %}
+            <div class="space-y-1">
+                <div class="grid grid-cols-12 gap-2 text-sm">
+                    <div class="col-span-6 text-gray-900 font-medium">{{ detail.menu_item.nama }}</div>
+                    <div class="col-span-2 text-center text-gray-700">{{ detail.jumlah }}x</div>
+                    <div class="col-span-4 text-right text-gray-900 font-semibold">Rp {{ detail.subtotal|floatformat:0 }}</div>
+                </div>
+                <div class="text-xs text-gray-500 ml-1">
                     @ Rp {{ detail.harga_per_item|floatformat:0 }} = Rp {{ detail.subtotal|floatformat:0 }}
                 </div>
-                <div class="item-qty"></div>
-                <div class="item-price"></div>
+                {% if detail.catatan_item %}
+                <div class="text-xs text-blue-600 ml-1 italic">
+                    <i class="fas fa-sticky-note mr-1"></i>{{ detail.catatan_item }}
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
 
-        <div class="total-section">
-            <div class="total-row">
-                <span>Subtotal:</span>
-                <span>Rp {{ total|floatformat:0 }}</span>
+        <!-- Total Section -->
+        <div class="receipt-border border-t pt-4 space-y-2">
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Subtotal:</span>
+                <span class="text-gray-900 font-semibold">Rp {{ subtotal|floatformat:0 }}</span>
             </div>
-            <div class="total-row">
-                <span>Pajak (10%):</span>
-                <span>Rp {{ total|mul:0.1|floatformat:0 }}</span>
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-600">Pajak (10%):</span>
+                <span class="text-gray-900 font-semibold">Rp {{ tax_amount|floatformat:0 }}</span>
             </div>
-            <div class="total-row grand-total">
-                <span>TOTAL:</span>
-                <span>Rp {{ total|mul:1.1|floatformat:0 }}</span>
+            <div class="border-t border-gray-400 pt-2 mt-2">
+                <div class="flex justify-between items-center text-lg font-bold">
+                    <span class="text-gray-900">TOTAL:</span>
+                    <span class="text-gray-900">Rp {{ grand_total|floatformat:0 }}</span>
+                </div>
             </div>
         </div>
 
-        <div class="footer">
-            <div>Terima kasih atas kunjungan Anda!</div>
-            <div>Selamat menikmati hidangan</div>
-            <div style="margin-top: 10px;">
-                Status: {{ pesanan.get_status_display }}
+        <!-- Footer -->
+        <div class="text-center mt-6 pt-4 receipt-border border-t space-y-2">
+            <div class="bg-green-50 text-green-800 px-3 py-2 rounded-lg text-sm font-medium screen-only">
+                <i class="fas fa-check-circle mr-2"></i>{{ pesanan.get_status_display }}
+            </div>
+            <div class="print-only text-sm">Status: {{ pesanan.get_status_display }}</div>
+            
+            <div class="text-gray-600 text-sm space-y-1 mt-4">
+                <p class="font-semibold">Terima kasih atas kunjungan Anda!</p>
+                <p>Selamat menikmati hidangan</p>
+            </div>
+            
+            <div class="screen-only mt-4 p-3 bg-blue-50 rounded-lg">
+                <p class="text-blue-800 text-xs">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Simpan receipt ini sebagai bukti pembayaran
+                </p>
             </div>
         </div>
     </div>
 
     <script>
-        // Auto print saat halaman dimuat
+        // Auto print saat halaman dimuat (hanya jika tidak ada parameter noprint)
         window.onload = function() {
-            window.print();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('noprint')) {
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            }
         }
+
+        // Handle print dialog
+        window.addEventListener('beforeprint', function() {
+            document.body.classList.add('printing');
+        });
+
+        window.addEventListener('afterprint', function() {
+            document.body.classList.remove('printing');
+        });
     </script>
 </body>
 </html>

@@ -3,99 +3,149 @@
 {% block title %}Dashboard Kasir{% endblock %}
 
 {% block nav_title %}
-    <i class="fas fa-cash-register me-2"></i>Dashboard Kasir
+    Dashboard Kasir
 {% endblock %}
 
 {% block nav_items %}
-<div class="navbar-nav ms-auto">
-    <a class="nav-link" href="{% url 'kasir:dapur' %}">
-        <i class="fas fa-fire me-1"></i>Dapur
+<div class="flex items-center space-x-4">
+    <a href="{% url 'kasir:dapur' %}" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-fire mr-2"></i>Kitchen Display
+    </a>
+    <a href="/" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-home mr-2"></i>Home
     </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-search me-2"></i>
-                    Cari Pesanan Berdasarkan Meja
-                </h5>
+<!-- Header Section -->
+<div class="text-center mb-12 animate-fade-in">
+    <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-lg mb-6">
+        <i class="fas fa-cash-register text-white text-2xl"></i>
+    </div>
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Dashboard Kasir</h1>
+    <p class="text-xl text-gray-600">Kelola pembayaran pesanan dengan mudah dan cepat</p>
+</div>
+
+<!-- Search Section -->
+<div class="max-w-2xl mx-auto mb-16">
+    <div class="bg-white rounded-2xl shadow-xl card-hover p-8 animate-slide-up">
+        <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-4">
+                <i class="fas fa-search text-white text-lg"></i>
             </div>
-            <div class="card-body">
-                <form method="get" action="">
-                    <div class="mb-3">
-                        <label for="nomor_meja" class="form-label">Nomor Meja</label>
-                        <input type="text" class="form-control form-control-lg" id="nomor_meja" name="nomor_meja" placeholder="Contoh: 1, A1, VIP01" required>
-                        <div class="form-text">Masukkan nomor meja untuk melihat pesanan yang belum dibayar</div>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i class="fas fa-search me-2"></i>
-                        Cari Pesanan
-                    </button>
-                </form>
-            </div>
+            <h3 class="text-2xl font-bold text-gray-900">Cari Pesanan Berdasarkan Meja</h3>
         </div>
+        
+        <form method="get" action="" class="space-y-6">
+            <div>
+                <label for="nomor_meja" class="block text-sm font-semibold text-gray-700 mb-2">Nomor Meja</label>
+                <input type="text" 
+                       class="w-full px-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" 
+                       id="nomor_meja" 
+                       name="nomor_meja" 
+                       placeholder="Contoh: 1, A1, VIP01" 
+                       required>
+                <p class="text-sm text-gray-500 mt-2">Masukkan nomor meja untuk melihat pesanan yang belum dibayar</p>
+            </div>
+            
+            <button type="submit" class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold inline-flex items-center justify-center w-full text-lg hover:shadow-lg transition-all duration-300">
+                <i class="fas fa-search mr-3"></i>            </button>
+        </form>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="alert alert-info" role="alert">
-            <h6 class="alert-heading">
-                <i class="fas fa-info-circle me-2"></i>
-                Petunjuk Penggunaan:
-            </h6>
-            <ul class="mb-0">
-                <li>Masukkan nomor meja untuk melihat semua pesanan yang belum dibayar</li>
-                <li>Sistem akan menampilkan detail pesanan beserta total yang harus dibayar</li>
-                <li>Tandai pesanan sebagai "Dibayar" setelah pelanggan melunasi pembayaran</li>
-                <li>Untuk melihat pesanan di dapur, gunakan menu <a href="{% url 'kasir:dapur' %}" class="alert-link">Kitchen Display System</a></li>
-            </ul>
+<!-- Info Cards Section -->
+<div class="grid md:grid-cols-3 gap-8 mb-16">
+    <!-- Petunjuk Penggunaan -->
+    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-xl p-8 animate-slide-up" style="animation-delay: 0.1s;">
+        <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-4">
+                <i class="fas fa-info-circle text-white text-lg"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900">Petunjuk Penggunaan</h3>
         </div>
+        <ul class="space-y-3 text-gray-700">
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-blue-600 mr-3 mt-0.5"></i>
+                <span>Masukkan nomor meja untuk melihat pesanan</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-blue-600 mr-3 mt-0.5"></i>
+                <span>Sistem menampilkan detail pesanan & total</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-blue-600 mr-3 mt-0.5"></i>
+                <span>Tandai sebagai "Dibayar" setelah lunas</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Kitchen Display -->
+    <div class="bg-white rounded-2xl shadow-xl card-hover p-8 text-center animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <i class="fas fa-fire text-white text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Kitchen Display</h3>
+        <p class="text-gray-600 mb-6">Monitor pesanan yang masuk dan sedang diproses</p>
+        <a href="{% url 'kasir:dapur' %}" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold inline-flex items-center justify-center w-full hover:shadow-lg transition-all duration-300">
+            <i class="fas fa-eye mr-2"></i>
+            Lihat Dapur
+        </a>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="bg-white rounded-2xl shadow-xl card-hover p-8 text-center animate-slide-up" style="animation-delay: 0.3s;">
+        <div class="w-16 h-16 bg-gradient-to-r from-gray-700 to-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <i class="fas fa-cogs text-white text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Menu Management</h3>
+        <p class="text-gray-600 mb-6">Kelola menu dan kategori melalui admin panel</p>
+        <a href="/admin/" target="_blank" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold inline-flex items-center justify-center w-full hover:shadow-lg transition-all duration-300">
+            <i class="fas fa-external-link-alt mr-2"></i>
+            Buka Admin
+        </a>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-utensils fa-3x text-primary mb-3"></i>
-                <h5 class="card-title">Menu Management</h5>
-                <p class="card-text">Kelola menu dan kategori melalui admin panel</p>
-                <a href="/admin/" class="btn btn-outline-primary" target="_blank">
-                    <i class="fas fa-external-link-alt me-1"></i>
-                    Buka Admin
-                </a>
-            </div>
-        </div>
+<!-- Quick Stats -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-2xl p-8 text-white animate-slide-up" style="animation-delay: 0.4s;">
+    <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold mb-2">Status Sistem</h3>
+        <p class="text-blue-200">Informasi real-time sistem kasir</p>
     </div>
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-fire fa-3x text-warning mb-3"></i>
-                <h5 class="card-title">Kitchen Display</h5>
-                <p class="card-text">Monitor pesanan yang masuk dan sedang diproses</p>
-                <a href="{% url 'kasir:dapur' %}" class="btn btn-outline-warning">
-                    <i class="fas fa-eye me-1"></i>
-                    Lihat Dapur
-                </a>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-clock text-white text-lg"></i>
             </div>
+            <div class="text-2xl font-bold">{{ current_time|date:"H:i" }}</div>
+            <div class="text-blue-200 text-sm">Waktu Saat Ini</div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-cash-register fa-3x text-success mb-3"></i>
-                <h5 class="card-title">Pembayaran</h5>
-                <p class="card-text">Proses pembayaran pesanan pelanggan</p>
-                <button class="btn btn-outline-success" onclick="document.getElementById('nomor_meja').focus()">
-                    <i class="fas fa-dollar-sign me-1"></i>
-                    Mulai Kasir
-                </button>
+        
+        <div class="text-center">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-fire text-white text-lg"></i>
             </div>
+            <div class="text-2xl font-bold">Online</div>
+            <div class="text-blue-200 text-sm">Kitchen Display</div>
+        </div>
+        
+        <div class="text-center">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-cash-register text-white text-lg"></i>
+            </div>
+            <div class="text-2xl font-bold">Ready</div>
+            <div class="text-blue-200 text-sm">Sistem Kasir</div>
+        </div>
+        
+        <div class="text-center">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-qrcode text-white text-lg"></i>
+            </div>
+            <div class="text-2xl font-bold">Active</div>
+            <div class="text-blue-200 text-sm">QR System</div>
         </div>
     </div>
 </div>
@@ -114,33 +164,84 @@ document.querySelector('form').addEventListener('submit', function(e) {
         return;
     }
     
-    // Redirect to detail page
-    window.location.href = `/kasir/kasir_meja/${encodeURIComponent(nomorMeja)}/`;
+    // Show loading state
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mencari...';
+    button.disabled = true;
+    
+    // Simulate loading then redirect
+    setTimeout(() => {
+        window.location.href = `/kasir/kasir_meja/${encodeURIComponent(nomorMeja)}/`;
+    }, 500);
 });
 
 function showToast(type, message) {
+    const colors = {
+        'success': 'bg-green-500',
+        'warning': 'bg-yellow-500',
+        'error': 'bg-red-500',
+        'info': 'bg-blue-500'
+    };
+    
     const toastHtml = `
-        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger'} border-0 position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        <div class="fixed top-4 right-4 z-50 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-x-full opacity-0" id="toast">
+            <div class="flex items-center">
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times' : 'info-circle'} mr-3"></i>
+                <span>${message}</span>
+                <button onclick="closeToast()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
     `;
     
     document.body.insertAdjacentHTML('beforeend', toastHtml);
-    const toastElement = document.body.lastElementChild;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
+    const toast = document.getElementById('toast');
     
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        toastElement.remove();
-    });
+    // Animate in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full', 'opacity-0');
+    }, 100);
+    
+    // Auto remove
+    setTimeout(() => {
+        closeToast();
+    }, 3000);
+}
+
+function closeToast() {
+    const toast = document.getElementById('toast');
+    if (toast) {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }
 }
 
 // Auto focus on nomor meja input
-document.getElementById('nomor_meja').focus();
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('nomor_meja').focus();
+    
+    // Add enter key listener
+    document.getElementById('nomor_meja').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('form').dispatchEvent(new Event('submit'));
+        }
+    });
+});
+
+// Add floating animation to icon
+document.addEventListener('DOMContentLoaded', function() {
+    const icon = document.querySelector('.floating-element');
+    if (icon) {
+        setInterval(() => {
+            icon.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                icon.style.transform = 'translateY(0px)';
+            }, 1500);
+        }, 3000);
+    }
+});
 </script>
 {% endblock %}

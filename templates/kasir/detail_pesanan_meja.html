@@ -3,129 +3,182 @@
 {% block title %}Pesanan Meja {{ meja.nomor_meja }}{% endblock %}
 
 {% block nav_title %}
-    <i class="fas fa-cash-register me-2"></i>Pesanan - {{ meja }}
+    Pesanan - {{ meja }}
 {% endblock %}
 
 {% block nav_items %}
-<div class="navbar-nav ms-auto">
-    <a class="nav-link" href="{% url 'kasir:kasir_dashboard' %}">
-        <i class="fas fa-arrow-left me-1"></i>Kembali
+<div class="flex items-center space-x-4">
+    <a href="{% url 'kasir:kasir_dashboard' %}" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-arrow-left mr-2"></i>Kembali
     </a>
-    <a class="nav-link" href="{% url 'kasir:dapur' %}">
-        <i class="fas fa-fire me-1"></i>Dapur
+    <a href="{% url 'kasir:dapur' %}" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-fire mr-2"></i>Kitchen Display
+    </a>
+    <a href="/" class="text-white hover:text-blue-200 transition-colors duration-200 flex items-center px-4 py-2 rounded-lg hover:bg-white/10">
+        <i class="fas fa-home mr-2"></i>Home
     </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-table me-2"></i>
-                    Informasi Meja
-                </h5>
+<!-- Header Section -->
+<div class="text-center mb-12 animate-fade-in">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-800 rounded-3xl shadow-2xl mb-6 floating-element">
+        <i class="fas fa-table text-white text-3xl"></i>
+    </div>
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Meja {{ meja.nomor_meja }}</h1>
+    <p class="text-xl text-gray-600">Kelola pesanan dan pembayaran untuk meja ini</p>
+</div>
+
+<!-- Table Info -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-2xl p-8 text-white mb-12 animate-slide-up">
+    <div class="grid md:grid-cols-3 gap-6 text-center">
+        <div>
+            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-hashtag text-white text-2xl"></i>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Nomor Meja:</strong> {{ meja.nomor_meja }}</p>
-                        <p><strong>Kapasitas:</strong> {{ meja.kapasitas }} orang</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Status:</strong> 
-                            {% if meja.is_aktif %}
-                                <span class="badge bg-success">Aktif</span>
-                            {% else %}
-                                <span class="badge bg-danger">Nonaktif</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
+            <h3 class="text-2xl font-bold mb-2">{{ meja.nomor_meja }}</h3>
+            <p class="text-blue-200">Nomor Meja</p>
+        </div>
+        
+        <div>
+            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-users text-white text-2xl"></i>
             </div>
+            <h3 class="text-2xl font-bold mb-2">{{ meja.kapasitas }}</h3>
+            <p class="text-blue-200">Kapasitas Orang</p>
+        </div>
+        
+        <div>
+            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-{% if meja.is_aktif %}check-circle{% else %}times-circle{% endif %} text-white text-2xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">
+                {% if meja.is_aktif %}
+                    <span class="text-green-300">Aktif</span>
+                {% else %}
+                    <span class="text-red-300">Nonaktif</span>
+                {% endif %}
+            </h3>
+            <p class="text-blue-200">Status Meja</p>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-receipt me-2"></i>
-                    Pesanan yang Belum Dibayar ({{ pesanan_list|length }})
-                </h5>
-            </div>
-            <div class="card-body">
-                {% if pesanan_list %}
+<!-- Orders Section -->
+<div class="mb-12">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden animate-slide-up">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6">
+            <h3 class="text-white text-2xl font-bold flex items-center">
+                <i class="fas fa-receipt mr-3"></i>
+                Pesanan yang Belum Dibayar
+                <span class="ml-auto bg-white/20 text-white px-4 py-2 rounded-full text-lg">{{ pesanan_list|length }}</span>
+            </h3>
+        </div>
+        
+        <div class="p-6">
+            {% if pesanan_list %}
+                <div class="space-y-6">
                     {% for pesanan in pesanan_list %}
-                    <div class="border rounded p-3 mb-3 bg-light">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="grid lg:grid-cols-3 gap-6">
+                            <!-- Order Info & Items -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <!-- Order Header -->
+                                <div class="flex justify-between items-start">
                                     <div>
-                                        <h6 class="text-primary mb-1">
-                                            <i class="fas fa-hashtag"></i>Pesanan #{{ pesanan.id }}
-                                        </h6>
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>{{ pesanan.created_at|date:"d/m/Y H:i" }}
-                                        </small>
+                                        <h4 class="text-xl font-bold text-gray-900 flex items-center">
+                                            <span class="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-3 py-1 rounded-full text-sm mr-3">#{{ pesanan.id }}</span>
+                                            Pesanan {{ pesanan.id }}
+                                        </h4>
+                                        <p class="text-gray-600 flex items-center mt-2">
+                                            <i class="fas fa-clock mr-2 text-blue-600"></i>
+                                            {{ pesanan.created_at|date:"d/m/Y H:i" }}
+                                        </p>
                                     </div>
                                     <div>
                                         {% if pesanan.status == 'BARU' %}
-                                            <span class="badge bg-warning text-dark">{{ pesanan.get_status_display }}</span>
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                                <i class="fas fa-hourglass-start mr-2"></i>{{ pesanan.get_status_display }}
+                                            </span>
                                         {% elif pesanan.status == 'DIPROSES' %}
-                                            <span class="badge bg-info">{{ pesanan.get_status_display }}</span>
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-cog fa-spin mr-2"></i>{{ pesanan.get_status_display }}
+                                            </span>
                                         {% elif pesanan.status == 'SELESAI' %}
-                                            <span class="badge bg-success">{{ pesanan.get_status_display }}</span>
+                                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-2"></i>{{ pesanan.get_status_display }}
+                                            </span>
                                         {% endif %}
                                     </div>
                                 </div>
                                 
-                                <!-- Detail Items -->
-                                <div class="border-top pt-2">
-                                    <h6 class="mb-2">Detail Pesanan:</h6>
-                                    {% for detail in pesanan.detailpesanan_set.all %}
-                                    <div class="d-flex justify-content-between align-items-center py-1">
-                                        <div>
-                                            <span class="fw-bold">{{ detail.jumlah }}x</span> {{ detail.menu_item.nama }}
-                                            {% if detail.catatan_item %}
-                                                <br><small class="text-info"><em>Note: {{ detail.catatan_item }}</em></small>
-                                            {% endif %}
+                                <!-- Order Items -->
+                                <div class="bg-white rounded-xl p-4 border border-gray-100">
+                                    <h5 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                        <i class="fas fa-utensils mr-2 text-blue-600"></i>Detail Pesanan
+                                    </h5>
+                                    <div class="space-y-2">
+                                        {% for detail in pesanan.detailpesanan_set.all %}
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                            <div class="flex-1">
+                                                <div class="flex items-center">
+                                                    <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold mr-3">{{ detail.jumlah }}x</span>
+                                                    <span class="font-medium text-gray-900">{{ detail.menu_item.nama }}</span>
+                                                </div>
+                                                {% if detail.catatan_item %}
+                                                <div class="mt-1 ml-8">
+                                                    <span class="text-blue-600 text-sm italic flex items-center">
+                                                        <i class="fas fa-sticky-note mr-1"></i>{{ detail.catatan_item }}
+                                                    </span>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <span class="font-semibold text-gray-900">Rp {{ detail.subtotal|floatformat:0 }}</span>
                                         </div>
-                                        <small class="text-muted">Rp {{ detail.subtotal|floatformat:0 }}</small>
+                                        {% endfor %}
                                     </div>
-                                    {% endfor %}
                                 </div>
                                 
                                 {% if pesanan.catatan %}
-                                <div class="border-top pt-2 mt-2">
-                                    <small class="text-info">
-                                        <i class="fas fa-sticky-note me-1"></i>
-                                        <strong>Catatan:</strong> {{ pesanan.catatan }}
-                                    </small>
+                                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                    <div class="flex items-start">
+                                        <i class="fas fa-comment-alt text-blue-600 mr-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="font-semibold text-blue-900 mb-1">Catatan Pesanan:</h6>
+                                            <p class="text-blue-800">{{ pesanan.catatan }}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {% endif %}
                             </div>
                             
-                            <div class="col-md-4">
-                                <div class="text-center">
-                                    <div class="h4 text-success mb-3">
-                                        Rp {{ pesanan.total_harga|floatformat:0 }}
-                                    </div>                                      {% if pesanan.status == 'SELESAI' %}
-                                        <button class="btn btn-success btn-lg w-100 mb-2" data-pesanan-id="{{ pesanan.id }}" onclick="markAsPaid(this.dataset.pesananId)">
-                                            <i class="fas fa-money-bill-wave me-2"></i>
+                            <!-- Payment Actions -->
+                            <div class="flex flex-col justify-center">
+                                <div class="text-center space-y-4">
+                                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-2xl">
+                                        <div class="text-3xl font-bold">Rp {{ pesanan.total_harga|floatformat:0 }}</div>
+                                        <div class="text-green-100 text-sm">Total Pesanan</div>
+                                    </div>
+                                    
+                                    {% if pesanan.status == 'SELESAI' %}
+                                        <button class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                                                data-pesanan-id="{{ pesanan.id }}" 
+                                                onclick="markAsPaid(this.dataset.pesananId)">
+                                            <i class="fas fa-money-bill-wave mr-2"></i>
                                             Tandai Dibayar
                                         </button>
-                                        <a href="{% url 'kasir:print_receipt' pesanan.id %}" class="btn btn-outline-primary btn-sm w-100" target="_blank">
-                                            <i class="fas fa-print me-1"></i>
-                                            Print Receipt
+                                        <a href="{% url 'kasir:print_receipt' pesanan.id %}" 
+                                           class="w-full block bg-white hover:bg-gray-50 text-blue-600 font-semibold py-3 px-6 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-all duration-300" 
+                                           target="_blank">
+                                            <i class="fas fa-print mr-2"></i>Print Receipt
                                         </a>
                                     {% else %}
-                                        <div class="alert alert-warning small mb-0">
-                                            <i class="fas fa-hourglass-half me-1"></i>
-                                            Menunggu dari dapur
+                                        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-xl">
+                                            <i class="fas fa-hourglass-half mr-2"></i>
+                                            <div class="font-semibold">Menunggu dari Dapur</div>
+                                            <div class="text-sm text-yellow-600 mt-1">Pesanan sedang diproses</div>
                                         </div>
                                     {% endif %}
                                 </div>
@@ -133,26 +186,19 @@
                         </div>
                     </div>
                     {% endfor %}
-                    
-                    <!-- Total Summary -->
-                    {% if pesanan_list %}
-                    <div class="border-top pt-3 mt-3">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Total Keseluruhan:</h5>
+                </div>
+                
+                <!-- Total Summary -->
+                {% if pesanan_list %}
+                <div class="mt-8 pt-6 border-t-2 border-gray-200">
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold">Total Keseluruhan</h3>
+                                <p class="text-blue-200">{{ pesanan_list|length }} pesanan aktif</p>
                             </div>
-                            <div class="col-md-4 text-end">
-                                {% with total=pesanan_list|first %}
-                                    {% with total_amount=0 %}
-                                        {% for pesanan in pesanan_list %}
-                                            {% with total_amount=total_amount|add:pesanan.total_harga %}
-                                            {% endwith %}
-                                        {% endfor %}
-                                    {% endwith %}
-                                {% endwith %}
-                                
-                                <h4 class="text-success">
-                                    Rp {% widthratio pesanan_list|length 1 0 as zero %}
+                            <div class="text-right">
+                                {% with total_amount=0 %}
                                     {% for pesanan in pesanan_list %}
                                         {% if forloop.first %}
                                             {% widthratio pesanan.total_harga 1 1 as running_total %}
@@ -160,55 +206,71 @@
                                             {% widthratio running_total|add:pesanan.total_harga 1 1 as running_total %}
                                         {% endif %}
                                         {% if forloop.last %}
-                                            {{ running_total|floatformat:0 }}
+                                            <div class="text-4xl font-bold">Rp {{ running_total|floatformat:0 }}</div>
                                         {% endif %}
                                     {% endfor %}
-                                </h4>
+                                {% endwith %}
+                                <div class="text-blue-200">Total yang harus dibayar</div>
                             </div>
                         </div>
                     </div>
-                    {% endif %}
-                    
-                {% else %}
-                    <div class="text-center text-muted py-4">
-                        <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
-                        <h5>Tidak ada pesanan yang belum dibayar</h5>
-                        <p>Semua pesanan untuk meja ini sudah lunas atau belum ada pesanan.</p>
-                        <a href="{% url 'kasir:kasir_dashboard' %}" class="btn btn-primary">
-                            <i class="fas fa-arrow-left me-1"></i>
-                            Kembali ke Dashboard
-                        </a>
-                    </div>
+                </div>
                 {% endif %}
-            </div>
+                
+            {% else %}
+                <div class="text-center py-16">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-6">
+                        <i class="fas fa-check-circle text-green-600 text-4xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Tidak Ada Pesanan Tertunda</h3>
+                    <p class="text-gray-600 mb-8 max-w-md mx-auto">Semua pesanan untuk meja ini sudah lunas atau belum ada pesanan baru.</p>
+                    <a href="{% url 'kasir:kasir_dashboard' %}" 
+                       class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <!-- Confirmation Modal -->
-<div class="modal fade" id="confirmPaymentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-money-bill-wave me-2"></i>
-                    Konfirmasi Pembayaran
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin pesanan ini sudah dibayar oleh pelanggan?</p>
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Perhatian:</strong> Tindakan ini tidak dapat dibatalkan.
+<div id="confirmPaymentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full mx-4 transform scale-95 transition-all duration-300" id="modalContent">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 rounded-t-3xl">
+            <h3 class="text-xl font-bold text-white flex items-center">
+                <i class="fas fa-money-bill-wave mr-3"></i>
+                Konfirmasi Pembayaran
+            </h3>
+        </div>
+        
+        <!-- Body -->
+        <div class="p-6">
+            <p class="text-gray-700 mb-4">Apakah Anda yakin pesanan ini sudah dibayar oleh pelanggan?</p>
+            <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold text-yellow-800">Perhatian</h4>
+                        <p class="text-yellow-700 text-sm">Tindakan ini tidak dapat dibatalkan.</p>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-success" id="confirmPaymentBtn">
-                    <i class="fas fa-check me-1"></i>Ya, Sudah Dibayar
-                </button>
-            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="p-6 pt-0 flex space-x-3">
+            <button type="button" 
+                    class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-xl transition-colors duration-200" 
+                    onclick="closeModal()">
+                Batal
+            </button>
+            <button type="button" 
+                    id="confirmPaymentBtn"
+                    class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200">
+                <i class="fas fa-check mr-2"></i>Ya, Sudah Dibayar
+            </button>
         </div>
     </div>
 </div>
@@ -220,9 +282,42 @@ let currentPesananId = null;
 
 function markAsPaid(pesananId) {
     currentPesananId = pesananId;
-    const modal = new bootstrap.Modal(document.getElementById('confirmPaymentModal'));
-    modal.show();
+    showModal();
 }
+
+function showModal() {
+    const modal = document.getElementById('confirmPaymentModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Animate modal
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95');
+        modalContent.classList.add('scale-100');
+    }, 10);
+}
+
+function closeModal() {
+    const modal = document.getElementById('confirmPaymentModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    modalContent.classList.remove('scale-100');
+    modalContent.classList.add('scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 300);
+}
+
+// Close modal when clicking outside
+document.getElementById('confirmPaymentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
 
 document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
     if (!currentPesananId) return;
@@ -232,12 +327,13 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
     
     // Disable button and show loading
     button.disabled = true;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Memproses...';
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
     
     fetch(`/kasir/api/update-status-pesanan/${currentPesananId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
         },
         body: JSON.stringify({
             status: 'DIBAYAR'
@@ -249,8 +345,7 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
             showToast('success', 'Pesanan berhasil ditandai sebagai dibayar');
             
             // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmPaymentModal'));
-            modal.hide();
+            closeModal();
             
             // Reload page after short delay
             setTimeout(() => {
@@ -271,25 +366,46 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
 });
 
 function showToast(type, message) {
+    const toastId = 'toast-' + Date.now();
+    const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    
     const toastHtml = `
-        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;">
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        <div id="${toastId}" class="fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-50 transform translate-x-full transition-transform duration-300 max-w-sm">
+            <div class="flex items-center">
+                <i class="fas ${icon} mr-3"></i>
+                <span class="font-medium">${message}</span>
+                <button onclick="removeToast('${toastId}')" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
     `;
     
     document.body.insertAdjacentHTML('beforeend', toastHtml);
-    const toastElement = document.body.lastElementChild;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
+    const toastElement = document.getElementById(toastId);
     
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        toastElement.remove();
-    });
+    // Animate in
+    setTimeout(() => {
+        toastElement.classList.remove('translate-x-full');
+        toastElement.classList.add('translate-x-0');
+    }, 10);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        removeToast(toastId);
+    }, 5000);
+}
+
+function removeToast(toastId) {
+    const toast = document.getElementById(toastId);
+    if (toast) {
+        toast.classList.remove('translate-x-0');
+        toast.classList.add('translate-x-full');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
 }
 </script>
 {% endblock %}

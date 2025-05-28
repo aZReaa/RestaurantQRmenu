@@ -100,14 +100,22 @@ def print_receipt(request, pesanan_id):
     View untuk print receipt pesanan
     """
     pesanan = get_object_or_404(Pesanan, id=pesanan_id)
-      # Hitung total pesanan
+    
+    # Hitung total pesanan
     detail_pesanan = pesanan.detailpesanan_set.all()
-    total = sum(detail.subtotal for detail in detail_pesanan)
+    subtotal = sum(detail.subtotal for detail in detail_pesanan)
+      # Hitung pajak dan total
+    from decimal import Decimal
+    tax_rate = Decimal('0.1')  # 10% tax
+    tax_amount = subtotal * tax_rate
+    grand_total = subtotal + tax_amount
     
     context = {
         'pesanan': pesanan,
         'detail_pesanan': detail_pesanan,
-        'total': total,
+        'subtotal': subtotal,
+        'tax_amount': tax_amount,
+        'grand_total': grand_total,
         'print_time': timezone.now(),
     }
     
