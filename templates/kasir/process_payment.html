@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Process Payment - Restaurant QR{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center py-6">
+                <a href="{% url 'kasir:kasir_index' %}" 
+                   class="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg mr-4 transition-colors">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Process Payment</h1>
+                    <p class="text-gray-600">Proses pembayaran pesanan #{{ pesanan.id }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Order Details -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Order Details</h3>
+                </div>
+                <div class="p-6">
+                    <!-- Order Info -->
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Order ID:</span>
+                            <span class="font-semibold">#{{ pesanan.id }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Table:</span>
+                            <span class="font-semibold">{{ pesanan.meja.nomor_meja }}</span>
+                        </div>
+                        {% if pesanan.nama_pemesan %}
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Customer Name:</span>
+                            <span class="font-semibold">{{ pesanan.nama_pemesan }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Order Time:</span>
+                            <span class="font-semibold">{{ pesanan.created_at|date:"d M Y - H:i" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Status:</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i>{{ pesanan.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h4 class="font-medium text-gray-900 mb-4">Order Items</h4>
+                        <div class="space-y-3">
+                            {% for detail in detail_pesanan %}
+                            <div class="flex justify-between items-center py-2">
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">{{ detail.menu_item.nama }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        {{ detail.jumlah }}x @ Rp {{ detail.menu_item.harga|floatformat:0 }}
+                                    </div>
+                                    {% if detail.catatan %}
+                                    <div class="text-xs text-gray-500 italic">
+                                        Note: {{ detail.catatan }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="font-semibold text-gray-900">
+                                    Rp {{ detail.subtotal|floatformat:0 }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Payment Summary</h3>
+                </div>
+                <div class="p-6">
+                    <!-- Price Breakdown -->
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span class="font-medium">Rp {{ subtotal|floatformat:0 }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Tax (10%):</span>
+                            <span class="font-medium">Rp {{ tax_amount|floatformat:0 }}</span>
+                        </div>
+                        <div class="border-t border-gray-200 pt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-semibold text-gray-900">Total:</span>
+                                <span class="text-2xl font-bold text-green-600">Rp {{ grand_total|floatformat:0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selection -->
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                          <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center p-3 border-2 border-green-300 bg-green-50 rounded-lg cursor-pointer">
+                                    <input type="radio" name="payment_method" value="cash" checked disabled 
+                                           class="w-4 h-4 text-green-600 border-green-300">
+                                    <div class="ml-3 flex items-center">
+                                        <i class="fas fa-money-bill text-green-600 mr-2"></i>
+                                        <span class="font-medium text-green-800">Cash (Tunai)</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Saat ini hanya melayani pembayaran tunai</p>
+                        </div>
+
+                        <!-- Payment Amount Input (for cash payments) -->
+                        <div id="cash-amount-section" class="space-y-3">
+                            <label for="amount_received" class="block text-sm font-medium text-gray-700">
+                                Amount Received (Cash)
+                            </label>
+                            <input type="number" 
+                                   id="amount_received" 
+                                   name="amount_received"
+                                   min="{{ grand_total }}"
+                                   step="1000"
+                                   value="{{ grand_total }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Enter amount received">
+                            <div id="change-amount" class="text-sm text-gray-600">
+                                Change: Rp <span id="change-value">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-4 pt-6">
+                            <a href="{% url 'kasir:kasir_index' %}" 
+                               class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-center transition-colors">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </a>
+                            <button type="submit" 
+                                    class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors">
+                                <i class="fas fa-check mr-2"></i>Process Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Change calculation only (cash payment only)
+const amountInput = document.getElementById('amount_received');
+const changeValue = document.getElementById('change-value');
+const grandTotal = {{ grand_total }};
+
+function calculateChange() {
+    const received = parseFloat(amountInput.value) || 0;
+    const change = received - grandTotal;
+    changeValue.textContent = Math.max(0, change).toLocaleString('id-ID');
+}
+
+amountInput.addEventListener('input', calculateChange);
+
+// Initialize
+calculateChange();
+</script>
+{% endblock %}

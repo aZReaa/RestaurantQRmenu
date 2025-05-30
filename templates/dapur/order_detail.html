@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Dapur - Kitchen Display System{% endblock %}
+
+{% block nav_title %}Dapur Dashboard{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-7xl mx-auto p-4">
+    <div class="mb-6">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-700">
+                <i class="fas fa-utensils mr-2"></i>
+                Kitchen Display System
+            </h1>
+            <div class="text-gray-500">
+                <i class="fas fa-clock mr-1"></i>
+                {{ "now"|date:"d/m/Y H:i" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-gradient-to-r from-blue-400 to-blue-500 text-white rounded-xl shadow-lg p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h4 class="text-2xl font-bold">{{ total_baru }}</h4>
+                    <p class="text-white/90">Pesanan Baru</p>
+                </div>
+                <i class="fas fa-bell text-3xl animate-pulse"></i>
+            </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-xl shadow-lg p-5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h4 class="text-2xl font-bold">{{ total_diproses }}</h4>
+                    <p class="text-white/90">Sedang Diproses</p>
+                </div>
+                <i class="fas fa-fire text-3xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Orders Section -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-blue-500 px-6 py-4">
+            <h3 class="font-semibold text-white flex items-center">
+                <i class="fas fa-bell mr-2"></i>
+                Pesanan Baru
+            </h3>
+        </div>
+        <div class="p-4">
+            {% if pesanan_baru %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for pesanan in pesanan_baru %}
+                    <div class="bg-white border border-blue-100 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full text-sm">
+                                #{{ pesanan.id }}
+                            </span>
+                            <span class="text-gray-500 text-sm">
+                                {{ pesanan.created_at|date:"H:i" }}
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-800 mb-1">Meja {{ pesanan.meja.nomor_meja }}</h4>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            {{ pesanan.detailpesanan_set.count }} item | {{ pesanan.created_at|timesince }} yang lalu
+                        </p>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'dapur:order_detail' pesanan.id %}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded-md text-sm flex-1 text-center">
+                                <i class="fas fa-eye mr-1"></i> Lihat Detail
+                            </a>
+                            <button 
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-md text-sm flex-1"
+                                onclick="updateOrderStatus({{ pesanan.id }}, 'DIPROSES')">
+                                <i class="fas fa-fire mr-1"></i> Proses
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-10">
+                    <div class="mb-3 text-gray-300">
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                    <h4 class="text-lg text-gray-500">Tidak ada pesanan baru</h4>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- In Process Orders Section -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-yellow-500 px-6 py-4">
+            <h3 class="font-semibold text-white flex items-center">
+                <i class="fas fa-fire mr-2"></i>
+                Sedang Diproses
+            </h3>
+        </div>
+        <div class="p-4">
+            {% if pesanan_diproses %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for pesanan in pesanan_diproses %}
+                    <div class="bg-white border border-yellow-100 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-yellow-100 text-yellow-800 font-medium px-3 py-1 rounded-full text-sm">
+                                #{{ pesanan.id }}
+                            </span>
+                            <span class="text-gray-500 text-sm">
+                                {{ pesanan.created_at|date:"H:i" }}
+                            </span>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-800 mb-1">Meja {{ pesanan.meja.nomor_meja }}</h4>
+                        <p class="text-gray-600 mb-4 text-sm">
+                            {{ pesanan.detailpesanan_set.count }} item | {{ pesanan.created_at|timesince }} yang lalu
+                        </p>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'dapur:order_detail' pesanan.id %}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-2 rounded-md text-sm flex-1 text-center">
+                                <i class="fas fa-eye mr-1"></i> Lihat Detail
+                            </a>
+                            <button 
+                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md text-sm flex-1"
+                                onclick="updateOrderStatus({{ pesanan.id }}, 'SELESAI')">
+                                <i class="fas fa-check mr-1"></i> Selesai
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-10">
+                    <div class="mb-3 text-gray-300">
+                        <i class="fas fa-fire-alt fa-3x"></i>
+                    </div>
+                    <h4 class="text-lg text-gray-500">Tidak ada pesanan yang sedang diproses</h4>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Quick Links -->
+    <div class="flex justify-center space-x-4 mt-8">
+        <a href="{% url 'home' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200">
+            <i class="fas fa-home mr-1"></i>
+            Home
+        </a>
+        <a href="{% url 'kasir:kasir_index' %}" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg transition-colors duration-200">
+            <i class="fas fa-cash-register mr-1"></i>
+            Kasir
+        </a>
+        <a href="{% url 'authentication:logout' %}" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition-colors duration-200">
+            <i class="fas fa-sign-out-alt mr-1"></i>
+            Logout
+        </a>
+    </div>
+</div>
+
+<!-- JavaScript for Status Updates -->
+<script>
+function updateOrderStatus(orderId, newStatus) {
+    if (confirm('Ubah status pesanan menjadi ' + newStatus + '?')) {
+        fetch(`/dapur/update-status/${orderId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Reload to show updated data
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan. Silahkan coba lagi.');
+        });
+    }
+}
+
+// Auto refresh every 30 seconds
+setInterval(() => {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

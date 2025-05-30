@@ -18,16 +18,25 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import render
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def home_view(request):
-    return render(request, 'home.html')
+    """
+    Home view that redirects based on user role
+    """
+    # Import here to avoid circular imports
+    from authentication.views import redirect_by_role
+    return redirect_by_role(request.user)
 
 urlpatterns = [
     path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     path('menu/', include('menu.urls')),
     path('kasir/', include('kasir.urls')),
+    path('dapur/', include('dapur.urls')),
+    path('auth/', include('authentication.urls', namespace='authentication')),
 ]
 
 # Serving media files in development

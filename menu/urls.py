@@ -4,6 +4,7 @@ from . import views
 app_name = 'menu'
 
 urlpatterns = [
+    path('', views.menu_index, name='menu_index'),
     path('meja/<str:nomor_meja>/', views.menu_view, name='menu_meja'),
     path('api/tambah-ke-keranjang/', views.tambah_ke_keranjang, name='tambah_ke_keranjang'),
     path('api/keranjang/checkout/', views.checkout_keranjang, name='checkout_keranjang'),

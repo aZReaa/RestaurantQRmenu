@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'menu',
     'kasir',
+    'dapur',
+    'authentication',
 ]
 
 MIDDLEWARE = [

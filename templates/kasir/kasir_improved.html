@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+
+{% block title %}Kasir Dashboard - Restaurant QR{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-green-600 to-blue-600 rounded-xl mr-4">
+                        <i class="fas fa-cash-register text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Kasir Dashboard</h1>
+                        <p class="text-gray-600">Selamat datang, {{ user.first_name|default:user.username }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-clock mr-1"></i>
+                        {{ "now"|date:"d M Y - H:i" }}
+                    </div>
+                    <a href="{% url 'authentication:logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Orders Ready for Payment -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
+                        <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Siap Dibayar</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_siap_bayar }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders in Progress -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-lg">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Sedang Diproses</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_diproses }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Revenue -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg">
+                        <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Pendapatan Hari Ini</p>
+                        <p class="text-2xl font-bold text-gray-900">Rp {{ total_pendapatan_hari_ini|floatformat:0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+            <div class="p-6">
+                <form method="get" class="flex flex-wrap items-end gap-4">
+                    <div class="flex-1 min-w-64">
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-search mr-1"></i>Cari Pesanan
+                        </label>
+                        <input 
+                            type="text" 
+                            id="search" 
+                            name="search" 
+                            value="{{ search_query }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Cari berdasarkan ID pesanan, nomor meja, atau nama pemesan..."
+                        >
+                    </div>
+                    <div>
+                        <label for="search_type" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-filter mr-1"></i>Tipe Pencarian
+                        </label>
+                        <select 
+                            id="search_type" 
+                            name="search_type"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="all" {% if search_type == 'all' %}selected{% endif %}>Semua</option>
+                            <option value="meja" {% if search_type == 'meja' %}selected{% endif %}>Nomor Meja</option>
+                            <option value="id" {% if search_type == 'id' %}selected{% endif %}>ID Pesanan</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-search mr-1"></i>Cari
+                        </button>
+                        <a href="{% url 'kasir:kasir_index' %}" 
+                           class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-times mr-1"></i>Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Orders Ready for Payment -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-money-bill-wave text-green-600 mr-2"></i>
+                    Pesanan Siap Dibayar
+                    {% if total_siap_bayar %}
+                        <span class="text-sm font-normal text-gray-600">({{ total_siap_bayar }} pesanan)</span>
+                    {% endif %}
+                </h3>
+            </div>
+
+            {% if pesanan_siap_bayar %}
+                <div class="p-6">
+                    <div class="grid gap-4">
+                        {% for pesanan in pesanan_siap_bayar %}
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-2">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-3">
+                                            <i class="fas fa-check-circle mr-1"></i>{{ pesanan.get_status_display }}
+                                        </span>
+                                        <span class="text-sm text-gray-600">
+                                            <i class="fas fa-clock mr-1"></i>{{ pesanan.created_at|date:"H:i" }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center mb-2">
+                                        <div class="text-lg font-semibold text-gray-900 mr-4">
+                                            <i class="fas fa-chair mr-1 text-blue-600"></i>
+                                            Meja {{ pesanan.meja.nomor_meja }}
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            ID: #{{ pesanan.id }}
+                                        </div>
+                                    </div>
+                                    {% if pesanan.nama_pemesan %}
+                                    <div class="text-sm text-gray-600 mb-2">
+                                        <i class="fas fa-user mr-1"></i>{{ pesanan.nama_pemesan }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="text-sm text-gray-600">
+                                        <i class="fas fa-utensils mr-1"></i>
+                                        {{ pesanan.detailpesanan_set.count }} item(s)
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-green-600 mb-2">
+                                        Rp {{ pesanan.total_harga|floatformat:0 }}
+                                    </div>
+                                    <a href="{% url 'kasir:process_payment' pesanan.id %}" 
+                                       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg inline-flex items-center transition-colors">
+                                        <i class="fas fa-money-bill mr-2"></i>
+                                        Bayar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination for Ready Orders -->
+                    {% if pesanan_siap_bayar.has_other_pages %}
+                    <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+                        <div class="text-sm text-gray-700">
+                            Showing {{ pesanan_siap_bayar.start_index }} to {{ pesanan_siap_bayar.end_index }} of {{ pesanan_siap_bayar.paginator.count }} results
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            {% if pesanan_siap_bayar.has_previous %}
+                                <a href="?siap_page={{ pesanan_siap_bayar.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}" 
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    Previous
+                                </a>
+                            {% endif %}
+                            
+                            <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg">
+                                {{ pesanan_siap_bayar.number }}
+                            </span>
+                            
+                            {% if pesanan_siap_bayar.has_next %}
+                                <a href="?siap_page={{ pesanan_siap_bayar.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}" 
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    Next
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="p-12 text-center">
+                    <i class="fas fa-money-bill-wave text-gray-400 text-5xl mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada pesanan siap dibayar</h3>
+                    <p class="text-gray-600">
+                        {% if search_query %}
+                            Tidak ada pesanan yang sesuai dengan pencarian "{{ search_query }}".
+                        {% else %}
+                            Semua pesanan sudah dibayar atau masih dalam proses.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Orders in Progress -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-clock text-yellow-600 mr-2"></i>
+                    Pesanan Sedang Diproses
+                    {% if total_diproses %}
+                        <span class="text-sm font-normal text-gray-600">({{ total_diproses }} pesanan)</span>
+                    {% endif %}
+                </h3>
+            </div>
+
+            {% if pesanan_diproses %}
+                <div class="p-6">
+                    <div class="grid gap-4">
+                        {% for pesanan in pesanan_diproses %}
+                        <div class="border border-gray-200 rounded-lg p-4 bg-yellow-50">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center mb-2">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                     {% if pesanan.status == 'BARU' %}bg-blue-100 text-blue-800{% else %}bg-yellow-100 text-yellow-800{% endif %} mr-3">
+                                            <i class="fas {% if pesanan.status == 'BARU' %}fa-plus-circle{% else %}fa-clock{% endif %} mr-1"></i>
+                                            {{ pesanan.get_status_display }}
+                                        </span>
+                                        <span class="text-sm text-gray-600">
+                                            <i class="fas fa-clock mr-1"></i>{{ pesanan.created_at|date:"H:i" }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center mb-2">
+                                        <div class="text-lg font-semibold text-gray-900 mr-4">
+                                            <i class="fas fa-chair mr-1 text-blue-600"></i>
+                                            Meja {{ pesanan.meja.nomor_meja }}
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            ID: #{{ pesanan.id }}
+                                        </div>
+                                    </div>
+                                    {% if pesanan.nama_pemesan %}
+                                    <div class="text-sm text-gray-600 mb-2">
+                                        <i class="fas fa-user mr-1"></i>{{ pesanan.nama_pemesan }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="text-sm text-gray-600">
+                                        <i class="fas fa-utensils mr-1"></i>
+                                        {{ pesanan.detailpesanan_set.count }} item(s)
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-gray-900 mb-2">
+                                        Rp {{ pesanan.total_harga|floatformat:0 }}
+                                    </div>
+                                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-lg text-sm font-medium">
+                                        <i class="fas fa-hourglass-half mr-1"></i>
+                                        Menunggu
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination for In Progress Orders -->
+                    {% if pesanan_diproses.has_other_pages %}
+                    <div class="mt-6 flex items-center justify-center">
+                        <div class="flex items-center space-x-2">
+                            {% if pesanan_diproses.has_previous %}
+                                <a href="?diproses_page={{ pesanan_diproses.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}" 
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    Previous
+                                </a>
+                            {% endif %}
+                            
+                            <span class="px-3 py-2 text-sm font-medium text-white bg-yellow-600 border border-yellow-600 rounded-lg">
+                                {{ pesanan_diproses.number }}
+                            </span>
+                            
+                            {% if pesanan_diproses.has_next %}
+                                <a href="?diproses_page={{ pesanan_diproses.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}" 
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    Next
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="p-12 text-center">
+                    <i class="fas fa-clock text-gray-400 text-5xl mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada pesanan sedang diproses</h3>
+                    <p class="text-gray-600">
+                        {% if search_query %}
+                            Tidak ada pesanan yang sesuai dengan pencarian "{{ search_query }}".
+                        {% else %}
+                            Semua pesanan sudah selesai atau belum ada pesanan baru.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Auto-refresh functionality -->
+<script>
+// Auto refresh every 30 seconds
+setInterval(function() {
+    window.location.reload();
+}, 30000);
+
+// Show loading indicator during refresh
+let refreshTimer;
+function showRefreshIndicator() {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(function() {
+        const indicator = document.createElement('div');
+        indicator.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        indicator.innerHTML = '<i class="fas fa-sync-alt fa-spin mr-2"></i>Memperbarui data...';
+        document.body.appendChild(indicator);
+        
+        setTimeout(function() {
+            document.body.removeChild(indicator);
+        }, 2000);
+    }, 28000); // Show 2 seconds before refresh
+}
+
+// Initialize refresh indicator
+showRefreshIndicator();
+</script>
+{% endblock %}

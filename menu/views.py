@@ -11,6 +11,12 @@ from decimal import Decimal
 
 from .models import Meja, KategoriMenu, MenuItem, Pesanan, DetailPesanan, DailyReport, MenuAnalytics
 
+def menu_index(request):
+    """
+    View untuk halaman index menu - redirect ke QR codes
+    """
+    return HttpResponseRedirect(reverse('menu:qr_codes'))
+
 def menu_view(request, nomor_meja):
     """
     View untuk menampilkan menu berdasarkan nomor meja
@@ -87,8 +93,8 @@ def checkout_keranjang(request):
         nomor_meja = data.get('nomor_meja')
         items = data.get('items', [])
         catatan_pesanan = data.get('catatan_pesanan', '')
-        
-        # Validasi data
+        nama_pemesan = data.get('nama_pemesan', 'Pelanggan')
+          # Validasi data
         if not nomor_meja or not items:
             return JsonResponse({'status': 'error', 'message': 'Data tidak valid'}, status=400)
         
@@ -103,6 +109,7 @@ def checkout_keranjang(request):
             meja=meja,
             status='BARU',
             catatan=catatan_pesanan,
+            nama_pemesan=nama_pemesan,
             total_harga=0  # Akan dihitung otomatis di model
         )
         

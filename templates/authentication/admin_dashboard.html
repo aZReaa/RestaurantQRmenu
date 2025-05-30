@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Restoran QR{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl mr-4">
+                        <i class="fas fa-crown text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Super Admin Dashboard</h1>
+                        <p class="text-gray-600">Selamat datang, {{ user.first_name|default:user.username }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'authentication:user_management' %}" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                        <i class="fas fa-users mr-2"></i>
+                        Kelola User
+                    </a>
+                    <a href="{% url 'authentication:logout' %}" 
+                       class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Total Users -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Users</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_users }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kasir Users -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg">
+                        <i class="fas fa-cash-register text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Kasir</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_kasir }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dapur Users -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-lg">
+                        <i class="fas fa-utensils text-orange-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Dapur</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_dapur }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manager Users -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg">
+                        <i class="fas fa-user-tie text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Manager</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_manajer }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Management Actions -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Management Actions -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Management Actions</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{% url 'authentication:create_user' %}" 
+                               class="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
+                                <div class="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-user-plus text-white"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Tambah User Baru</p>
+                                    <p class="text-xs text-gray-600">Buat akun user baru</p>
+                                </div>
+                            </a>
+
+                            <a href="{% url 'authentication:user_management' %}" 
+                               class="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
+                                <div class="flex items-center justify-center w-10 h-10 bg-green-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-users-cog text-white"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Kelola User</p>
+                                    <p class="text-xs text-gray-600">Edit dan hapus user</p>
+                                </div>
+                            </a>
+
+                            <a href="/admin/" 
+                               class="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
+                                <div class="flex items-center justify-center w-10 h-10 bg-purple-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-cogs text-white"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Django Admin</p>
+                                    <p class="text-xs text-gray-600">Panel admin Django</p>
+                                </div>
+                            </a>
+
+                            <a href="{% url 'menu:analytics' %}" 
+                               class="flex items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors group">
+                                <div class="flex items-center justify-center w-10 h-10 bg-orange-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-chart-bar text-white"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">Analytics</p>
+                                    <p class="text-xs text-gray-600">Lihat laporan analytics</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Users -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Recent Users</h3>
+                </div>
+                <div class="p-6">
+                    {% if recent_users %}
+                        <div class="space-y-4">
+                            {% for user_profile in recent_users %}
+                            <div class="flex items-center">
+                                <div class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full">
+                                    <i class="fas fa-user text-gray-600 text-sm"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ user_profile.user.first_name|default:user_profile.user.username }}
+                                    </p>
+                                    <p class="text-xs text-gray-600">{{ user_profile.get_user_type_display }}</p>
+                                </div>
+                                <div class="ml-auto">
+                                    {% if user_profile.is_active %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Active
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            Inactive
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4">
+                            <a href="{% url 'authentication:user_management' %}" 
+                               class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Lihat semua users →
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 text-sm">Belum ada user yang terdaftar</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

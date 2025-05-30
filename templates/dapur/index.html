@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Dapur - Kitchen Display System{% endblock %}
+
+{% block nav_title %}Kitchen Display{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header with Stats -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                    <i class="fas fa-utensils text-blue-600 mr-3"></i>
+                    Kitchen Display System
+                </h1>
+                <p class="text-gray-600 mt-2">Kelola pesanan masakan dengan efisien</p>
+            </div>
+            <div class="flex space-x-4">
+                <div class="bg-orange-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-orange-600">{{ total_baru }}</div>
+                    <div class="text-sm text-orange-800">Pesanan Baru</div>
+                </div>
+                <div class="bg-blue-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-600">{{ total_diproses }}</div>
+                    <div class="text-sm text-blue-800">Sedang Diproses</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Layout -->
+    <div class="grid lg:grid-cols-2 gap-6">
+        <!-- New Orders -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-200">
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-clock mr-2"></i>
+                    Pesanan Baru ({{ total_baru }})
+                </h2>
+                <p class="text-orange-100 mt-1">Pesanan yang perlu segera diproses</p>
+            </div>
+            <div class="p-6 max-h-96 overflow-y-auto">
+                {% if pesanan_baru %}
+                    <div class="space-y-4">
+                        {% for pesanan in pesanan_baru %}
+                            <div class="border border-orange-200 rounded-xl p-4 hover:shadow-lg transition-all duration-200 bg-orange-50">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="font-bold text-gray-900">Meja {{ pesanan.meja.nomor_meja }}</h3>
+                                        <p class="text-sm text-gray-600">{{ pesanan.created_at|date:"H:i" }}</p>
+                                    </div>
+                                    <button onclick="startOrder({{ pesanan.id }})" 
+                                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 text-sm font-medium">
+                                        <i class="fas fa-play mr-1"></i>
+                                        Mulai
+                                    </button>
+                                </div>
+                                <div class="space-y-2">
+                                    {% for detail in pesanan.detailpesanan_set.all %}
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-700">{{ detail.menu_item.nama }} x{{ detail.quantity }}</span>
+                                            <span class="font-medium text-gray-900">Rp {{ detail.subtotal|floatformat:0 }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if pesanan.notes %}
+                                    <div class="mt-3 p-2 bg-yellow-100 rounded-lg">
+                                        <p class="text-sm text-yellow-800">
+                                            <i class="fas fa-sticky-note mr-1"></i>
+                                            {{ pesanan.notes }}
+                                        </p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-check-circle text-orange-300 text-4xl mb-3"></i>
+                        <p class="text-gray-500">Tidak ada pesanan baru</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Orders in Progress -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-200">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-2xl">
+                <h2 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-fire mr-2"></i>
+                    Sedang Diproses ({{ total_diproses }})
+                </h2>
+                <p class="text-blue-100 mt-1">Pesanan yang sedang dikerjakan</p>
+            </div>
+            <div class="p-6 max-h-96 overflow-y-auto">
+                {% if pesanan_diproses %}
+                    <div class="space-y-4">
+                        {% for pesanan in pesanan_diproses %}
+                            <div class="border border-blue-200 rounded-xl p-4 hover:shadow-lg transition-all duration-200 bg-blue-50">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="font-bold text-gray-900">Meja {{ pesanan.meja.nomor_meja }}</h3>
+                                        <p class="text-sm text-gray-600">{{ pesanan.created_at|date:"H:i" }}</p>
+                                    </div>
+                                    <button onclick="completeOrder({{ pesanan.id }})" 
+                                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 text-sm font-medium">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Selesai
+                                    </button>
+                                </div>
+                                <div class="space-y-2">
+                                    {% for detail in pesanan.detailpesanan_set.all %}
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-700">{{ detail.menu_item.nama }} x{{ detail.quantity }}</span>
+                                            <span class="font-medium text-gray-900">Rp {{ detail.subtotal|floatformat:0 }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if pesanan.notes %}
+                                    <div class="mt-3 p-2 bg-yellow-100 rounded-lg">
+                                        <p class="text-sm text-yellow-800">
+                                            <i class="fas fa-sticky-note mr-1"></i>
+                                            {{ pesanan.notes }}
+                                        </p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-check-circle text-blue-300 text-4xl mb-3"></i>
+                        <p class="text-gray-500">Tidak ada pesanan diproses</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function startOrder(pesananId) {
+    try {
+        const response = await fetch(`/dapur/update-status/${pesananId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                status: 'DIPROSES'
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // Show success message
+            showNotification('success', data.message);
+            // Reload page to update display
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification('error', data.message);
+        }
+    } catch (error) {
+        showNotification('error', 'Terjadi kesalahan saat memproses pesanan');
+    }
+}
+
+async function completeOrder(pesananId) {
+    try {
+        const response = await fetch(`/dapur/update-status/${pesananId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                status: 'SELESAI'
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // Show success message
+            showNotification('success', data.message);
+            // Reload page to update display
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification('error', data.message);
+        }
+    } catch (error) {
+        showNotification('error', 'Terjadi kesalahan saat menyelesaikan pesanan');
+    }
+}
+
+function showNotification(type, message) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg animate-slide-up ${
+        type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

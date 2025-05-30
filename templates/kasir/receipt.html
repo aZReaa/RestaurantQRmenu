@@ -3,7 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt - Pesanan #{{ pesanan.id }}</title>
+    <title>Receip        <!-- Footer -->
+        <div class="text-center mt-6 pt-4 receipt-border border-t space-y-2">
+            <div class="bg-green-50 text-green-800 px-3 py-2 rounded-lg text-sm font-medium screen-only">
+                <i class="fas fa-check-circle mr-2"></i>{{ pesanan.get_status_display }}
+            </div>
+            <div class="print-only text-sm">Status: {{ pesanan.get_status_display }}</div>
+            
+            <div class="text-gray-600 text-sm space-y-1 mt-4">
+                <p class="font-semibold">Terima kasih atas kunjungan Anda!</p>
+                <p>Selamat menikmati hidangan</p>
+            </div>
+            
+            <div class="screen-only mt-4 p-3 bg-blue-50 rounded-lg">
+                <p class="text-blue-800 text-xs">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Simpan receipt ini sebagai bukti pembayaran
+                </p>
+            </div>
+            
+            <!-- Control Buttons (Screen Only) -->
+            <div class="screen-only mt-6 flex gap-3 justify-center no-print">
+                <button onclick="window.print()" 
+                        class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-print mr-2"></i>Print Receipt
+                </button>
+                <button onclick="goBackToDashboard()" 
+                        class="flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>Close
+                </button>
+            </div>
+        </div>anan.id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script>
@@ -106,10 +136,9 @@
             <div class="flex justify-between items-center text-sm">
                 <span class="text-gray-600">Tanggal:</span>
                 <span class="font-semibold text-gray-900">{{ pesanan.created_at|date:"d/m/Y H:i" }}</span>
-            </div>
-            <div class="flex justify-between items-center text-sm">
+            </div>            <div class="flex justify-between items-center text-sm">
                 <span class="text-gray-600">Kasir:</span>
-                <span class="font-semibold text-gray-900">Admin</span>
+                <span class="font-semibold text-gray-900">{{ kasir_name|default:"Admin" }}</span>
             </div>
             <div class="flex justify-between items-center text-sm">
                 <span class="text-gray-600">Print:</span>
@@ -174,17 +203,32 @@
                 <p class="font-semibold">Terima kasih atas kunjungan Anda!</p>
                 <p>Selamat menikmati hidangan</p>
             </div>
-            
-            <div class="screen-only mt-4 p-3 bg-blue-50 rounded-lg">
+              <div class="screen-only mt-4 p-3 bg-blue-50 rounded-lg">
                 <p class="text-blue-800 text-xs">
                     <i class="fas fa-info-circle mr-1"></i>
                     Simpan receipt ini sebagai bukti pembayaran
                 </p>
             </div>
-        </div>
+            
+            <!-- Control Buttons (Screen Only) -->
+            <div class="screen-only mt-6 flex gap-3 justify-center no-print">
+                <button onclick="window.print()" 
+                        class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-print mr-2"></i>Print Receipt
+                </button>
+                <button onclick="goBackToDashboard()" 
+                        class="flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                    <i class="fas fa-times mr-2"></i>Close
+                </button>
+            </div>        </div>
     </div>
-
+    
     <script>
+        // Function to go back to kasir dashboard
+        function goBackToDashboard() {
+            window.location.href = "{% url 'kasir:kasir_index' %}";
+        }
+        
         // Auto print saat halaman dimuat (hanya jika tidak ada parameter noprint)
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -202,6 +246,19 @@
 
         window.addEventListener('afterprint', function() {
             document.body.classList.remove('printing');
+        });
+        
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC key to close
+            if (e.key === 'Escape') {
+                goBackToDashboard();
+            }
+            // Ctrl+P to print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
         });
     </script>
 </body>

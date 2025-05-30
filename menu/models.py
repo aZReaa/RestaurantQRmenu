@@ -68,13 +68,13 @@ class MenuItem(models.Model):
 class Pesanan(models.Model):
     STATUS_CHOICES = [
         ('BARU', 'Pesanan Baru'),
-        ('DIPROSES', 'Sedang Diproses'),
-        ('SELESAI', 'Selesai Dibuat'),
+        ('DIPROSES', 'Sedang Diproses'),        ('SELESAI', 'Selesai Dibuat'),
         ('DIBAYAR', 'Sudah Dibayar'),
         ('DIBATALKAN', 'Dibatalkan'),
     ]
     
     meja = models.ForeignKey(Meja, on_delete=models.CASCADE)
+    nama_pemesan = models.CharField(max_length=100, default='Pelanggan')
     total_harga = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='BARU')
     catatan = models.TextField(blank=True, null=True)
